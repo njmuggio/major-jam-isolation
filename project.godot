@@ -16,7 +16,12 @@ _global_script_class_icons={
 [application]
 
 config/name="master-jam-isolation"
+run/main_scene="res://MainLevel.tscn"
 config/icon="res://icon.png"
+
+[display]
+
+window/stretch/shrink=2.0
 
 [rendering]
 

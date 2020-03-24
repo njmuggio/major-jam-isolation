@@ -1,0 +1,15 @@
+[remap]
+
+importer="ogg_vorbis"
+type="AudioStreamOGGVorbis"
+path="res://.import/shrine.ogg-828041bc417767f168a14c31adc24eb4.oggstr"
+
+[deps]
+
+source_file="res://placeholders/audio/shrine.ogg"
+dest_files=[ "res://.import/shrine.ogg-828041bc417767f168a14c31adc24eb4.oggstr" ]
+
+[params]
+
+loop=true
+loop_offset=0
