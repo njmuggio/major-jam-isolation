@@ -2,7 +2,9 @@
 
 [ext_resource path="res://placeholders/textures/negative-space-night-sky-milky-way.jpg" type="Texture" id=1]
 
-[sub_resource type="CubeMesh" id=1]
+[sub_resource type="CylinderMesh" id=4]
+top_radius = 0.001
+radial_segments = 6
 
 [sub_resource type="PanoramaSky" id=2]
 panorama = ExtResource( 1 )
@@ -10,11 +12,13 @@ panorama = ExtResource( 1 )
 [sub_resource type="Environment" id=3]
 background_mode = 2
 background_sky = SubResource( 2 )
+background_sky_orientation = Basis( -1.62921e-07, 0, 1, 0, 1, 0, -1, 0, -1.62921e-07 )
 
 [node name="Spatial" type="Spatial"]
 
 [node name="CSGMesh" type="CSGMesh" parent="."]
-mesh = SubResource( 1 )
+transform = Transform( -1.62921e-07, -1, 0, 1, -1.62921e-07, 0, 0, 0, 1, 0, 0, 0 )
+mesh = SubResource( 4 )
 
 [node name="Camera" type="Camera" parent="."]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 5 )
