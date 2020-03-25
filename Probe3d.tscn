@@ -1,31 +1,27 @@
 [gd_scene load_steps=5 format=2]
 
 [ext_resource path="res://placeholders/textures/negative-space-night-sky-milky-way.jpg" type="Texture" id=1]
+[ext_resource path="res://models/Satellite.fbx" type="PackedScene" id=2]
 
-[sub_resource type="CylinderMesh" id=4]
-top_radius = 0.001
-radial_segments = 6
-
-[sub_resource type="PanoramaSky" id=2]
+[sub_resource type="PanoramaSky" id=1]
 panorama = ExtResource( 1 )
 
-[sub_resource type="Environment" id=3]
+[sub_resource type="Environment" id=2]
 background_mode = 2
-background_sky = SubResource( 2 )
+background_sky = SubResource( 1 )
 background_sky_orientation = Basis( -1.62921e-07, 0, 1, 0, 1, 0, -1, 0, -1.62921e-07 )
 
 [node name="Spatial" type="Spatial"]
 
-[node name="CSGMesh" type="CSGMesh" parent="."]
-transform = Transform( -1.62921e-07, -1, 0, 1, -1.62921e-07, 0, 0, 0, 1, 0, 0, 0 )
-mesh = SubResource( 4 )
-
 [node name="Camera" type="Camera" parent="."]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 5 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1.812 )
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
-environment = SubResource( 3 )
+environment = SubResource( 2 )
 
 [node name="DirectionalLight" type="DirectionalLight" parent="."]
 transform = Transform( 0.433997, 0.108988, -0.894298, -0.047584, 0.994043, 0.0980521, 0.899657, 0, 0.436598, 0, 0, 0 )
 light_energy = 0.5
+
+[node name="Satellite" parent="." instance=ExtResource( 2 )]
+transform = Transform( -1.62921e-06, -10, -1.62921e-06, 0, -1.62921e-06, 10, -10, 1.62921e-06, 2.65432e-13, -0.748, 0, 0 )
