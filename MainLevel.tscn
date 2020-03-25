@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=2]
+[gd_scene load_steps=8 format=2]
 
 [ext_resource path="res://placeholders/audio/shrine.ogg" type="AudioStream" id=1]
 [ext_resource path="res://MainLevel.gd" type="Script" id=2]
@@ -6,6 +6,7 @@
 [ext_resource path="res://mainTheme.tres" type="Theme" id=4]
 [ext_resource path="res://textures/consolePanel.png" type="Texture" id=5]
 [ext_resource path="res://textures/crosshair.png" type="Texture" id=6]
+[ext_resource path="res://textures/satCrosshair.png" type="Texture" id=7]
 
 [node name="Node2D" type="Node2D"]
 script = ExtResource( 2 )
@@ -17,6 +18,10 @@ offset = Vector2( 256, 150 )
 [node name="Crosshair" type="Sprite" parent="."]
 position = Vector2( 51, 249 )
 texture = ExtResource( 6 )
+
+[node name="satCrosshair" type="Sprite" parent="."]
+position = Vector2( 93, 291 )
+texture = ExtResource( 7 )
 
 [node name="UiControl" type="MarginContainer" parent="."]
 anchor_right = 1.0
