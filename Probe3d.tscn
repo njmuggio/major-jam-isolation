@@ -28,10 +28,10 @@ transform = Transform( 0.433997, 0.108988, -0.894298, -0.047584, 0.994043, 0.098
 light_color = Color( 0.984314, 0.980392, 0.85098, 1 )
 
 [node name="Spatial" type="Spatial" parent="."]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.748, 0, 0 )
+transform = Transform( 4.88762e-06, -10, 1.62921e-06, -5.30863e-13, 1.62921e-06, 10, -10, -4.88762e-06, 2.65432e-13, -0.748, 0, 0 )
 
 [node name="Satellite" parent="Spatial" instance=ExtResource( 2 )]
-transform = Transform( -1.62921e-06, -10, -1.62921e-06, 0, -1.62921e-06, 10, -10, 1.62921e-06, 2.65432e-13, 0, 0, 0 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0 )
 
 [node name="RayCast" type="RayCast" parent="Spatial/Satellite"]
 enabled = true
