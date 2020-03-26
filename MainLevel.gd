@@ -3,6 +3,7 @@ extends Node2D
 var debug: bool = true
 
 onready var ship = $UiControl/VBoxContainer/ViewportContainer/Viewport/Spatial/Spatial/Satellite
+onready var gimbal = $UiControl/VBoxContainer/HBoxContainer/ViewportContainer/Viewport/Spatial/Gimbal
 onready var satCross = $satCrosshair
 onready var ray = $UiControl/VBoxContainer/ViewportContainer/Viewport/Spatial/Spatial/Satellite/RayCast
 onready var collShape = $UiControl/VBoxContainer/ViewportContainer/Viewport/Spatial/Spatial/Area/CollisionShape
@@ -50,7 +51,8 @@ func _physics_process(delta):
 	rollRate += rollMod * rotAccel * delta
 	ship.rotate_object_local(Vector3(0, 1, 0), rollRate * delta)
 	ship.rotate_object_local(Vector3(1, 0, 0), pitchRate * delta)
-	pass
+	
+	gimbal.transform = ship.transform
 
 
 func _input(event):
