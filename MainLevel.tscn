@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=2]
+[gd_scene load_steps=10 format=2]
 
 [ext_resource path="res://placeholders/audio/shrine.ogg" type="AudioStream" id=1]
 [ext_resource path="res://MainLevel.gd" type="Script" id=2]
@@ -8,6 +8,7 @@
 [ext_resource path="res://textures/crosshair.png" type="Texture" id=6]
 [ext_resource path="res://textures/satCrosshair.png" type="Texture" id=7]
 [ext_resource path="res://textures/resBarBack.png" type="Texture" id=8]
+[ext_resource path="res://textures/resBarProg.png" type="Texture" id=9]
 
 [node name="Node2D" type="Node2D"]
 script = ExtResource( 2 )
@@ -95,23 +96,26 @@ max_value = 10.0
 value = 1.0
 tick_count = 10
 
-[node name="TextureProgress" type="TextureProgress" parent="UiControl/VBoxContainer/HBoxContainer/VBoxContainer"]
+[node name="TapeBar" type="TextureProgress" parent="UiControl/VBoxContainer/HBoxContainer/VBoxContainer"]
 margin_top = 76.0
 margin_right = 407.0
 margin_bottom = 80.0
 texture_under = ExtResource( 8 )
 
-[node name="TextureProgress2" type="TextureProgress" parent="UiControl/VBoxContainer/HBoxContainer/VBoxContainer"]
+[node name="BatBar" type="TextureProgress" parent="UiControl/VBoxContainer/HBoxContainer/VBoxContainer"]
 margin_top = 83.0
 margin_right = 407.0
 margin_bottom = 87.0
 texture_under = ExtResource( 8 )
 
-[node name="TextureProgress3" type="TextureProgress" parent="UiControl/VBoxContainer/HBoxContainer/VBoxContainer"]
+[node name="RtgBar" type="TextureProgress" parent="UiControl/VBoxContainer/HBoxContainer/VBoxContainer"]
 margin_top = 90.0
 margin_right = 407.0
 margin_bottom = 94.0
+value = 57.0
 texture_under = ExtResource( 8 )
+texture_progress = ExtResource( 9 )
+tint_progress = Color( 1, 0, 0, 1 )
 
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
 stream = ExtResource( 1 )
