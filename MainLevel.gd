@@ -8,15 +8,14 @@ onready var ray = $UiControl/VBoxContainer/ViewportContainer/Viewport/Spatial/Sp
 onready var collShape = $UiControl/VBoxContainer/ViewportContainer/Viewport/Spatial/Spatial/Area/CollisionShape
 onready var box = collShape.get_shape()
 onready var satCluster = $UiControl/VBoxContainer/ViewportContainer/Viewport/Spatial/Spatial
-onready var targetRot = ship.rotation
+onready var targetBearing = ship.transform.basis.z
 var rollRate = PI * -0.01
 var pitchRate = PI * 0.01
-var rotAccel = 0.01
+var rotAccel = 0.60
 var pitchMod = 0
 var rollMod = 0
 var count = 0
-const targetRoll = -90
-const targetPitch = 0
+
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -31,34 +30,26 @@ func _process(delta):
 #	var sliderVal = $UiControl/VBoxContainer/HBoxContainer/GridContainer/HSlider.value
 #	$UiControl/VBoxContainer/ViewportContainer.stretch_shrink = sliderVal
 #	$UiControl/VBoxContainer/ViewportContainer.stretch_shrink = round(range_lerp(abs(rad2deg(Vector3(0, -1, 0).angle_to(ray.cast_to.rotated(Vector3(-1, 0, 0), deg2rad(90))))), 0, 180, 1, 10))
-	$UiControl/VBoxContainer/ViewportContainer.stretch_shrink = round(range_lerp(abs(rad2deg(targetRot.angle_to(ship.rotation))), 0, 180, 1, 10))
-#	var roll = ship.rotation_degrees[0]
-#	var pitch = ship.rotation_degrees[2]
-#	var offX = range_lerp(targetPitch - pitch, -180, 180, 9, 93)
-#	var offY = range_lerp(targetRoll - roll, -180, 180, 207, 291)
-#	satCross.global_position[0] = offX
-#	satCross.global_position[1] = offY
+
+	# https://docs.godotengine.org/en/3.2/tutorials/3d/using_transforms.html
+	var bearing = ship.transform.basis.z
+	var angle_to_earth = abs(rad2deg(targetBearing.angle_to(bearing)))
+	$UiControl/VBoxContainer/ViewportContainer.stretch_shrink = round(range_lerp(angle_to_earth, 0, 180, 1, 10))
+	
 	satCross.global_position[0] = range_lerp(ray.get_collision_point()[0], satCluster.translation[0] - box.extents[0], satCluster.translation[0] + box.extents[0], 9, 93)
 	satCross.global_position[1] = range_lerp(ray.get_collision_point()[2], satCluster.translation[2] - box.extents[2], satCluster.translation[2] + box.extents[2], 207, 291)
 	count += 1
 	if count % 10 == 0:
-		print(str(ship.rotation) + ' ' + str(targetRot))
-		print(abs(rad2deg(targetRot.angle_to(ship.rotation))))
-#		print(ray.cast_to.rotated(Vector3(-1, 0, 0), deg2rad(90)))
-#	print(int(pitch) % 180)
-#	trans[2][0] = offX
-#	satCross.transform = trans
+		print(str(bearing) + ' ' + str(targetBearing))
+		print(angle_to_earth)
 	pass
 
 
 func _physics_process(delta):
-	pitchRate += pitchMod * rotAccel
-	rollRate += rollMod * rotAccel
-	ship.rotate_x(rollRate * delta)
-	ship.rotate_z(-pitchRate * delta)
-#	var curRot = ship.rotation
-#	ship.rotation = Vector3(curRot[0] + rollRate * delta, deg2rad(135), curRot[2] - pitchRate * delta)
-#	ship.rotation = Vector3(curRot[0] + rollRate * delta, curRot[1] - pitchRate * delta, 0)
+	pitchRate += pitchMod * rotAccel * delta
+	rollRate += rollMod * rotAccel * delta
+	ship.rotate_object_local(Vector3(0, 1, 0), rollRate * delta)
+	ship.rotate_object_local(Vector3(1, 0, 0), pitchRate * delta)
 	pass
 
 
