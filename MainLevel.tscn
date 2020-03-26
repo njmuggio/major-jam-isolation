@@ -1,6 +1,6 @@
 [gd_scene load_steps=10 format=2]
 
-[ext_resource path="res://placeholders/audio/shrine.ogg" type="AudioStream" id=1]
+[ext_resource path="res://music/cocktails-and-lobsters-by-alexander-nakarada-from-filmmusic-io_01.ogg" type="AudioStream" id=1]
 [ext_resource path="res://MainLevel.gd" type="Script" id=2]
 [ext_resource path="res://Probe3d.tscn" type="PackedScene" id=3]
 [ext_resource path="res://mainTheme.tres" type="Theme" id=4]
@@ -106,16 +106,19 @@ texture_under = ExtResource( 8 )
 margin_top = 83.0
 margin_right = 407.0
 margin_bottom = 87.0
+value = 50.0
 texture_under = ExtResource( 8 )
+texture_progress = ExtResource( 9 )
 
 [node name="RtgBar" type="TextureProgress" parent="UiControl/VBoxContainer/HBoxContainer/VBoxContainer"]
 margin_top = 90.0
 margin_right = 407.0
 margin_bottom = 94.0
-value = 57.0
+max_value = 100.0
+value = 100.0
 texture_under = ExtResource( 8 )
 texture_progress = ExtResource( 9 )
-tint_progress = Color( 1, 0, 0, 1 )
+tint_progress = Color( 0, 1, 0, 1 )
 
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
 stream = ExtResource( 1 )
