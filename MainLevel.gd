@@ -4,17 +4,19 @@ var debug: bool = true
 
 onready var ship = $UiControl/VBoxContainer/ViewportContainer/Viewport/Spatial/Spatial/Satellite
 onready var gimbal = $UiControl/VBoxContainer/HBoxContainer/ViewportContainer/Viewport/Spatial/Gimbal
-onready var satCross = $satCrosshair
-onready var ray = $UiControl/VBoxContainer/ViewportContainer/Viewport/Spatial/Spatial/Satellite/RayCast
-onready var collShape = $UiControl/VBoxContainer/ViewportContainer/Viewport/Spatial/Spatial/Area/CollisionShape
-onready var box = collShape.get_shape()
 onready var satCluster = $UiControl/VBoxContainer/ViewportContainer/Viewport/Spatial/Spatial
+
 onready var targetBearing = ship.transform.basis.z
+onready var gimbalTransform = gimbal.transform
+
 var rollRate = PI * -0.01
 var pitchRate = PI * 0.01
+
 var rotAccel = 0.60
+
 var pitchMod = 0
 var rollMod = 0
+
 var count = 0
 
 
@@ -37,8 +39,6 @@ func _process(delta):
 	var angle_to_earth = abs(rad2deg(targetBearing.angle_to(bearing)))
 	$UiControl/VBoxContainer/ViewportContainer.stretch_shrink = round(range_lerp(angle_to_earth, 0, 180, 1, 10))
 	
-	satCross.global_position[0] = range_lerp(ray.get_collision_point()[0], satCluster.translation[0] - box.extents[0], satCluster.translation[0] + box.extents[0], 9, 93)
-	satCross.global_position[1] = range_lerp(ray.get_collision_point()[2], satCluster.translation[2] - box.extents[2], satCluster.translation[2] + box.extents[2], 207, 291)
 	count += 1
 	if count % 10 == 0:
 		print(str(bearing) + ' ' + str(targetBearing))
@@ -52,7 +52,9 @@ func _physics_process(delta):
 	ship.rotate_object_local(Vector3(0, 1, 0), rollRate * delta)
 	ship.rotate_object_local(Vector3(1, 0, 0), pitchRate * delta)
 	
-	gimbal.transform = ship.transform
+	var b = ship.transform.basis
+	gimbal.transform.basis = Basis(-b.x, b.z, -b.y)
+	gimbal.transform = ship.transform * gimbalTransform
 
 
 func _input(event):
