@@ -54,15 +54,10 @@ func _physics_process(delta):
 	rollRate += rollMod * rotAccel * delta
 	yawRate += yawMod * rotAccel * delta
 	
-#	ship.rotate_object_local(Vector3(1, 0, 0), pitchRate * delta)
-#	ship.rotate_object_local(Vector3(0, 1, 0), rollRate * delta)
-#	ship.rotate_object_local(Vector3(0, 0, 1), yawRate * delta)
 	ship.rotate_x(pitchRate * delta)
 	ship.rotate_y(rollRate * delta)
 	ship.rotate_z(yawRate * delta)
 	
-	var b = ship.transform.basis
-	gimbal.transform.basis = Basis(-b.x, b.z, -b.y)
 	gimbal.transform = ship.transform * gimbalTransform
 
 
