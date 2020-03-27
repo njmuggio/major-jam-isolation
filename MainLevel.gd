@@ -11,11 +11,13 @@ onready var gimbalTransform = gimbal.transform
 
 var rollRate = PI * -0.01
 var pitchRate = PI * 0.01
+var yawRate = PI * 0.01
 
 var rotAccel = 0.60
 
 var pitchMod = 0
 var rollMod = 0
+var yawMod = 0
 
 var count = 0
 
@@ -25,6 +27,7 @@ func _ready():
 	if debug:
 		rollRate = 0
 		pitchRate = 0
+		yawRate = 0
 	pass
 
 
@@ -49,8 +52,11 @@ func _process(delta):
 func _physics_process(delta):
 	pitchRate += pitchMod * rotAccel * delta
 	rollRate += rollMod * rotAccel * delta
-	ship.rotate_object_local(Vector3(0, 1, 0), rollRate * delta)
+	yawRate += yawMod * rotAccel * delta
+	
 	ship.rotate_object_local(Vector3(1, 0, 0), pitchRate * delta)
+	ship.rotate_object_local(Vector3(0, 1, 0), rollRate * delta)
+	ship.rotate_object_local(Vector3(0, 0, 1), yawRate * delta)
 	
 	var b = ship.transform.basis
 	gimbal.transform.basis = Basis(-b.x, b.z, -b.y)
@@ -66,6 +72,11 @@ func _input(event):
 		rollMod += 1
 	if event.is_action_pressed("roll_neg"):
 		rollMod -= 1
+	if event.is_action_pressed("yaw_pos"):
+		yawMod += 1
+	if event.is_action_pressed("yaw_neg"):
+		yawMod -= 1
+	
 	if event.is_action_released("pitch_neg"):
 		pitchMod += 1
 	if event.is_action_released("pitch_pos"):
@@ -74,4 +85,7 @@ func _input(event):
 		rollMod -= 1
 	if event.is_action_released("roll_neg"):
 		rollMod += 1
-	pass
+	if event.is_action_released("yaw_pos"):
+		yawMod -= 1
+	if event.is_action_released("yaw_neg"):
+		yawMod += 1
