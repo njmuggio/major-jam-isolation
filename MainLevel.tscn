@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=2]
+[gd_scene load_steps=11 format=2]
 
 [ext_resource path="res://music/life_in_corrupted_binary_01.ogg" type="AudioStream" id=1]
 [ext_resource path="res://MainLevel.gd" type="Script" id=2]
@@ -6,8 +6,6 @@
 [ext_resource path="res://mainTheme.tres" type="Theme" id=4]
 [ext_resource path="res://textures/consolePanel.png" type="Texture" id=5]
 [ext_resource path="res://textures/crosshair.png" type="Texture" id=6]
-[ext_resource path="res://textures/resBarBack.png" type="Texture" id=8]
-[ext_resource path="res://textures/resBarProg.png" type="Texture" id=9]
 [ext_resource path="res://Resource.tscn" type="PackedScene" id=10]
 [ext_resource path="res://Gimbal.tscn" type="PackedScene" id=11]
 
@@ -110,19 +108,19 @@ max_value = 10.0
 value = 1.0
 tick_count = 10
 
-[node name="TapeBar" type="TextureProgress" parent="UiControl/VBoxContainer/HBoxContainer/VBoxContainer"]
+[node name="TapeRes" parent="UiControl/VBoxContainer/HBoxContainer/VBoxContainer" instance=ExtResource( 10 )]
+anchor_right = 0.0
+anchor_bottom = 0.0
 margin_top = 76.0
 margin_right = 407.0
 margin_bottom = 80.0
-texture_under = ExtResource( 8 )
 
-[node name="BatBar" type="TextureProgress" parent="UiControl/VBoxContainer/HBoxContainer/VBoxContainer"]
+[node name="BatRes" parent="UiControl/VBoxContainer/HBoxContainer/VBoxContainer" instance=ExtResource( 10 )]
+anchor_right = 0.0
+anchor_bottom = 0.0
 margin_top = 83.0
 margin_right = 407.0
 margin_bottom = 87.0
-value = 50.0
-texture_under = ExtResource( 8 )
-texture_progress = ExtResource( 9 )
 
 [node name="RtgRes" parent="UiControl/VBoxContainer/HBoxContainer/VBoxContainer" instance=ExtResource( 10 )]
 anchor_right = 0.0
@@ -131,16 +129,6 @@ margin_top = 90.0
 margin_right = 407.0
 margin_bottom = 94.0
 rect_min_size = Vector2( 0, 4 )
-
-[node name="RtgBar" type="TextureProgress" parent="UiControl/VBoxContainer/HBoxContainer/VBoxContainer"]
-visible = false
-margin_top = 90.0
-margin_right = 407.0
-margin_bottom = 94.0
-value = 100.0
-texture_under = ExtResource( 8 )
-texture_progress = ExtResource( 9 )
-tint_progress = Color( 0, 1, 0, 1 )
 
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
 stream = ExtResource( 1 )

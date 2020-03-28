@@ -1,21 +1,26 @@
 extends Node2D
 
-var debug: bool = false
+var debug: bool = true
 
+const physicsFps = 60 # UPDATE THIS IF PHYSICS RATE GETS UPDATED - CAN'T READ A CONSTANT FROM PROJECT SETTINGS
 const gameMinutes = 1
-const rtgLifetimeMsec = 60 * 1000 * gameMinutes
+#const rtgLifetimeMsec = 60 * 1000 * gameMinutes
+const rtgLifetimeTicks = gameMinutes * 60 * physicsFps
 const powerPerTick = 5
 const maxBatteryPower = 10000 * gameMinutes
 const idlePowerUse = 1
 const reactionWheelPowerUse = 10
+const tapeSize = 100 * gameMinutes
 
 onready var ship = $UiControl/VBoxContainer/ViewportContainer/Viewport/Spatial/Spatial/Satellite
 onready var gimbal = $UiControl/VBoxContainer/HBoxContainer/ViewportContainer/Viewport/Spatial/Gimbal
 onready var satCluster = $UiControl/VBoxContainer/ViewportContainer/Viewport/Spatial/Spatial
 
 onready var targetBearing = ship.transform.basis.z
-onready var tapeBar = $UiControl/VBoxContainer/HBoxContainer/VBoxContainer/TapeBar
-onready var batBar = $UiControl/VBoxContainer/HBoxContainer/VBoxContainer/BatBar
+#onready var tapeBar = $UiControl/VBoxContainer/HBoxContainer/VBoxContainer/TapeBar
+onready var tapeRes = $UiControl/VBoxContainer/HBoxContainer/VBoxContainer/TapeRes
+#onready var batBar = $UiControl/VBoxContainer/HBoxContainer/VBoxContainer/BatBar
+onready var batRes = $UiControl/VBoxContainer/HBoxContainer/VBoxContainer/BatRes
 #onready var rtgBar = $UiControl/VBoxContainer/HBoxContainer/VBoxContainer/RtgBar
 onready var rtgRes = $UiControl/VBoxContainer/HBoxContainer/VBoxContainer/RtgRes
 onready var gimbalTransform = gimbal.transform
@@ -31,7 +36,7 @@ var rollMod = 0
 var yawMod = 0
 
 var count = 0
-var startTime: int = 0
+var tickCount = 0
 var gameActive = true
 var batteryPower = 0
 
@@ -56,17 +61,11 @@ func _process(delta):
 		$AudioStreamPlayer.pitch_scale = lerp($AudioStreamPlayer.pitch_scale, 0.5, delta)
 		return
 	
-	var msecRemaining = rtgLifetimeMsec - (OS.get_ticks_msec() - startTime)
-	rtgRes.value = msecRemaining
-#	var hue = range_lerp(msecRemaining, 0, rtgLifetimeMsec, 0, 120)
-#	rtgBar.value = msecRemaining
-#	rtgBar.tint_progress = Color.from_hsv(hue / 360, 1, 1)
+#	var msecRemaining = rtgLifetimeMsec - (OS.get_ticks_msec() - startTime)
+	rtgRes.value = rtgLifetimeTicks - tickCount
+	batRes.value = batteryPower
 	
-	var hue = range_lerp(batteryPower, 0, maxBatteryPower, 0, 120)
-	batBar.value = batteryPower
-	batBar.tint_progress = Color.from_hsv(hue / 360, 1, 1)
-	
-	if batteryPower <= 0 and msecRemaining <= 0:
+	if batteryPower <= 0 and tickCount >= rtgLifetimeTicks:
 		game_over()
 	
 	# https://docs.godotengine.org/en/3.2/tutorials/3d/using_transforms.html
@@ -86,21 +85,18 @@ func _physics_process(delta):
 	if not gameActive:
 		return
 	
+	tickCount += 1
+	
 	var powerGen = powerPerTick as float
-	var msecRemaining = rtgLifetimeMsec - (OS.get_ticks_msec() - startTime)
-	if msecRemaining <= 0:
+#	var msecRemaining = rtgLifetimeMsec - (OS.get_ticks_msec() - startTime)
+	if tickCount >= rtgLifetimeTicks:
 		powerGen = 0
-	var powerUsed = (abs(pitchMod) + abs(rollMod)) * reactionWheelPowerUse + idlePowerUse
+	var powerUsed = (abs(pitchMod) + abs(rollMod) + abs(yawMod)) * reactionWheelPowerUse + idlePowerUse
 	var powerFraction = 1.0
 	if powerUsed > 0:
 		powerFraction = clamp((batteryPower + powerGen) / (powerUsed), 0.0, 1.0)
 	batteryPower = clamp(batteryPower + (powerGen - powerUsed), 0, maxBatteryPower)
-	
-	count += 1
-#	if count % 5 == 0:
-	if powerFraction < 1:
-		print(str(powerUsed) + '\t' + str(batteryPower) + '\t' + str(powerGen) + '\t' + str(powerFraction))
-	
+		
 	pitchRate += pitchMod * rotAccel * delta * powerFraction
 	rollRate += rollMod * rotAccel * delta * powerFraction
 	yawRate += yawMod * rotAccel * delta * powerFraction
@@ -143,11 +139,23 @@ func _input(event):
 
 
 func start():
-	batBar.max_value = maxBatteryPower
-#	rtgBar.max_value = rtgLifetimeMsec
+	# Tape setup
+	tapeRes.minimum = 0
+	tapeRes.maximum = tapeSize
+	tapeRes.value = 0
+	
+	# Battery setup
+	batRes.minimum = 0
+	batRes.maximum = maxBatteryPower
+	batRes.value = 0
+	
+	# RTG setup
 	rtgRes.minimum = 0
-	rtgRes.maximum = rtgLifetimeMsec
-	startTime = OS.get_ticks_msec()
+	rtgRes.maximum = rtgLifetimeTicks
+	rtgRes.value = rtgLifetimeTicks
+	
+	# Init game
+	tickCount = 0
 	gameActive = true
 	pass
 

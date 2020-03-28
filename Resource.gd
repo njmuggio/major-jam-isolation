@@ -24,6 +24,13 @@ func _process(delta):
 	pass
 
 
+# Add 'amt' to the value. This is executed immediately, instead of being added to the request queue.
+# Returns the new value.
+func apply(amt):
+	value += amt
+	return value
+
+
 func set_minimum(val):
 	bar.min_value = val
 	minimum = val
