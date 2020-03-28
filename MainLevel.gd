@@ -18,7 +18,8 @@ onready var satCluster = $UiControl/VBoxContainer/ViewportContainer/Viewport/Spa
 onready var targetBearing = ship.transform.basis.z
 onready var tapeBar = $UiControl/VBoxContainer/HBoxContainer/VBoxContainer/TapeBar
 onready var batBar = $UiControl/VBoxContainer/HBoxContainer/VBoxContainer/BatBar
-onready var rtgBar = $UiControl/VBoxContainer/HBoxContainer/VBoxContainer/RtgBar
+#onready var rtgBar = $UiControl/VBoxContainer/HBoxContainer/VBoxContainer/RtgBar
+onready var rtgRes = $UiControl/VBoxContainer/HBoxContainer/VBoxContainer/RtgRes
 var rollRate = PI * -0.01
 var pitchRate = PI * 0.01
 var rotAccel = 0.60
@@ -50,11 +51,12 @@ func _process(delta):
 		return
 	
 	var msecRemaining = rtgLifetimeMsec - (OS.get_ticks_msec() - startTime)
-	var hue = range_lerp(msecRemaining, 0, rtgLifetimeMsec, 0, 120)
-	rtgBar.value = msecRemaining
-	rtgBar.tint_progress = Color.from_hsv(hue / 360, 1, 1)
+	rtgRes.value = msecRemaining
+#	var hue = range_lerp(msecRemaining, 0, rtgLifetimeMsec, 0, 120)
+#	rtgBar.value = msecRemaining
+#	rtgBar.tint_progress = Color.from_hsv(hue / 360, 1, 1)
 	
-	hue = range_lerp(batteryPower, 0, maxBatteryPower, 0, 120)
+	var hue = range_lerp(batteryPower, 0, maxBatteryPower, 0, 120)
 	batBar.value = batteryPower
 	batBar.tint_progress = Color.from_hsv(hue / 360, 1, 1)
 	
@@ -120,7 +122,9 @@ func _input(event):
 
 func start():
 	batBar.max_value = maxBatteryPower
-	rtgBar.max_value = rtgLifetimeMsec
+#	rtgBar.max_value = rtgLifetimeMsec
+	rtgRes.minimum = 0
+	rtgRes.maximum = rtgLifetimeMsec
 	startTime = OS.get_ticks_msec()
 	gameActive = true
 	pass

@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=2]
+[gd_scene load_steps=11 format=2]
 
 [ext_resource path="res://music/life_in_corrupted_binary_01.ogg" type="AudioStream" id=1]
 [ext_resource path="res://MainLevel.gd" type="Script" id=2]
@@ -9,6 +9,7 @@
 [ext_resource path="res://textures/satCrosshair.png" type="Texture" id=7]
 [ext_resource path="res://textures/resBarBack.png" type="Texture" id=8]
 [ext_resource path="res://textures/resBarProg.png" type="Texture" id=9]
+[ext_resource path="res://Resource.tscn" type="PackedScene" id=10]
 
 [node name="Node2D" type="Node2D"]
 script = ExtResource( 2 )
@@ -110,7 +111,16 @@ value = 50.0
 texture_under = ExtResource( 8 )
 texture_progress = ExtResource( 9 )
 
+[node name="RtgRes" parent="UiControl/VBoxContainer/HBoxContainer/VBoxContainer" instance=ExtResource( 10 )]
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_top = 90.0
+margin_right = 407.0
+margin_bottom = 94.0
+rect_min_size = Vector2( 0, 4 )
+
 [node name="RtgBar" type="TextureProgress" parent="UiControl/VBoxContainer/HBoxContainer/VBoxContainer"]
+visible = false
 margin_top = 90.0
 margin_right = 407.0
 margin_bottom = 94.0
