@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=2]
+[gd_scene load_steps=13 format=2]
 
 [ext_resource path="res://music/life_in_corrupted_binary_01.ogg" type="AudioStream" id=1]
 [ext_resource path="res://MainLevel.gd" type="Script" id=2]
@@ -6,10 +6,17 @@
 [ext_resource path="res://mainTheme.tres" type="Theme" id=4]
 [ext_resource path="res://textures/consolePanel.png" type="Texture" id=5]
 [ext_resource path="res://textures/crosshair.png" type="Texture" id=6]
-[ext_resource path="res://textures/satCrosshair.png" type="Texture" id=7]
 [ext_resource path="res://textures/resBarBack.png" type="Texture" id=8]
 [ext_resource path="res://textures/resBarProg.png" type="Texture" id=9]
 [ext_resource path="res://Resource.tscn" type="PackedScene" id=10]
+[ext_resource path="res://Gimbal.tscn" type="PackedScene" id=11]
+
+[sub_resource type="Environment" id=1]
+ambient_light_color = Color( 0.760784, 0.537255, 0.113725, 1 )
+ambient_light_energy = 0.49
+
+[sub_resource type="World" id=2]
+environment = SubResource( 1 )
 
 [node name="Node2D" type="Node2D"]
 script = ExtResource( 2 )
@@ -20,11 +27,8 @@ offset = Vector2( 256, 150 )
 
 [node name="Crosshair" type="Sprite" parent="."]
 position = Vector2( 51, 249 )
+z_index = 1
 texture = ExtResource( 6 )
-
-[node name="satCrosshair" type="Sprite" parent="."]
-position = Vector2( 93, 291 )
-texture = ExtResource( 7 )
 
 [node name="UiControl" type="MarginContainer" parent="."]
 anchor_right = 1.0
@@ -74,6 +78,15 @@ __meta__ = {
 margin_right = 94.0
 margin_bottom = 94.0
 rect_min_size = Vector2( 94, 94 )
+
+[node name="Viewport" type="Viewport" parent="UiControl/VBoxContainer/HBoxContainer/ViewportContainer"]
+size = Vector2( 94, 94 )
+own_world = true
+world = SubResource( 2 )
+handle_input_locally = false
+render_target_update_mode = 3
+
+[node name="Spatial" parent="UiControl/VBoxContainer/HBoxContainer/ViewportContainer/Viewport" instance=ExtResource( 11 )]
 
 [node name="VBoxContainer" type="VBoxContainer" parent="UiControl/VBoxContainer/HBoxContainer"]
 margin_left = 97.0

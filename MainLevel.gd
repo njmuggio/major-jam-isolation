@@ -1,6 +1,6 @@
 extends Node2D
 
-var debug: bool = true
+var debug: bool = false
 
 const gameMinutes = 1
 const rtgLifetimeMsec = 60 * 1000 * gameMinutes
@@ -10,21 +10,26 @@ const idlePowerUse = 1
 const reactionWheelPowerUse = 10
 
 onready var ship = $UiControl/VBoxContainer/ViewportContainer/Viewport/Spatial/Spatial/Satellite
-onready var satCross = $satCrosshair
-onready var ray = $UiControl/VBoxContainer/ViewportContainer/Viewport/Spatial/Spatial/Satellite/RayCast
-onready var collShape = $UiControl/VBoxContainer/ViewportContainer/Viewport/Spatial/Spatial/Area/CollisionShape
-onready var box = collShape.get_shape()
+onready var gimbal = $UiControl/VBoxContainer/HBoxContainer/ViewportContainer/Viewport/Spatial/Gimbal
 onready var satCluster = $UiControl/VBoxContainer/ViewportContainer/Viewport/Spatial/Spatial
+
 onready var targetBearing = ship.transform.basis.z
 onready var tapeBar = $UiControl/VBoxContainer/HBoxContainer/VBoxContainer/TapeBar
 onready var batBar = $UiControl/VBoxContainer/HBoxContainer/VBoxContainer/BatBar
 #onready var rtgBar = $UiControl/VBoxContainer/HBoxContainer/VBoxContainer/RtgBar
 onready var rtgRes = $UiControl/VBoxContainer/HBoxContainer/VBoxContainer/RtgRes
+onready var gimbalTransform = gimbal.transform
+
 var rollRate = PI * -0.01
 var pitchRate = PI * 0.01
+var yawRate = PI * 0.01
+
 var rotAccel = 0.60
+
 var pitchMod = 0
 var rollMod = 0
+var yawMod = 0
+
 var count = 0
 var startTime: int = 0
 var gameActive = true
@@ -36,6 +41,7 @@ func _ready():
 	if debug:
 		rollRate = 0
 		pitchRate = 0
+		yawRate = 0
 	start()
 	pass
 
@@ -69,8 +75,10 @@ func _process(delta):
 	$UiControl/VBoxContainer/ViewportContainer.stretch_shrink = round(range_lerp(angle_to_earth, 0, 180, 1, 10))
 	$AudioStreamPlayer.pitch_scale = min(1.0, range_lerp(angle_to_earth, 30, 180, 1.0, 0.8))
 	
-	satCross.global_position[0] = range_lerp(ray.get_collision_point()[0], satCluster.translation[0] - box.extents[0], satCluster.translation[0] + box.extents[0], 9, 93)
-	satCross.global_position[1] = range_lerp(ray.get_collision_point()[2], satCluster.translation[2] - box.extents[2], satCluster.translation[2] + box.extents[2], 207, 291)
+	count += 1
+	if count % 10 == 0:
+		print(str(bearing) + ' ' + str(targetBearing))
+		print(angle_to_earth)
 	pass
 
 
@@ -95,8 +103,13 @@ func _physics_process(delta):
 	
 	pitchRate += pitchMod * rotAccel * delta * powerFraction
 	rollRate += rollMod * rotAccel * delta * powerFraction
-	ship.rotate_object_local(Vector3(0, 1, 0), rollRate * delta)
-	ship.rotate_object_local(Vector3(1, 0, 0), pitchRate * delta)
+	yawRate += yawMod * rotAccel * delta * powerFraction
+	
+	ship.rotate_x(pitchRate * delta)
+	ship.rotate_y(rollRate * delta)
+	ship.rotate_z(yawRate * delta)
+	
+	gimbal.transform = ship.transform * gimbalTransform
 	pass
 
 
@@ -109,6 +122,11 @@ func _input(event):
 		rollMod += 1
 	if event.is_action_pressed("roll_neg"):
 		rollMod -= 1
+	if event.is_action_pressed("yaw_pos"):
+		yawMod += 1
+	if event.is_action_pressed("yaw_neg"):
+		yawMod -= 1
+	
 	if event.is_action_released("pitch_neg"):
 		pitchMod += 1
 	if event.is_action_released("pitch_pos"):
@@ -117,6 +135,10 @@ func _input(event):
 		rollMod -= 1
 	if event.is_action_released("roll_neg"):
 		rollMod += 1
+	if event.is_action_released("yaw_pos"):
+		yawMod -= 1
+	if event.is_action_released("yaw_neg"):
+		yawMod += 1
 	pass
 
 
