@@ -166,30 +166,31 @@ size_flags_vertical = 3
 columns = 5
 
 [node name="Sensor0" parent="UiControl/VBoxContainer/HBoxContainer/VBoxContainer/GridContainer" instance=ExtResource( 8 )]
+sensorColor = Color( 0.560784, 0.85098, 0.796078, 1 )
 
 [node name="Sensor1" parent="UiControl/VBoxContainer/HBoxContainer/VBoxContainer/GridContainer" instance=ExtResource( 8 )]
 margin_left = 82.0
 margin_right = 160.0
 sensorNumber = 1
-sensorColor = Color( 1, 0, 0, 1 )
+sensorColor = Color( 0.670588, 0.74902, 0.388235, 1 )
 
 [node name="Sensor2" parent="UiControl/VBoxContainer/HBoxContainer/VBoxContainer/GridContainer" instance=ExtResource( 8 )]
 margin_left = 164.0
 margin_right = 242.0
 sensorNumber = 2
-sensorColor = Color( 0, 0, 1, 1 )
+sensorColor = Color( 0.94902, 0.721569, 0.447059, 1 )
 
 [node name="Sensor3" parent="UiControl/VBoxContainer/HBoxContainer/VBoxContainer/GridContainer" instance=ExtResource( 8 )]
 margin_left = 246.0
 margin_right = 324.0
 sensorNumber = 3
-sensorColor = Color( 1, 0.513726, 0, 1 )
+sensorColor = Color( 0.94902, 0.439216, 0.321569, 1 )
 
 [node name="Sensor4" parent="UiControl/VBoxContainer/HBoxContainer/VBoxContainer/GridContainer" instance=ExtResource( 8 )]
 margin_left = 328.0
 margin_right = 406.0
 sensorNumber = 4
-sensorColor = Color( 0.85098, 0, 1, 1 )
+sensorColor = Color( 0.85098, 0.313726, 0.262745, 1 )
 
 [node name="TapeRes" parent="UiControl/VBoxContainer/HBoxContainer/VBoxContainer" instance=ExtResource( 7 )]
 anchor_right = 0.0
