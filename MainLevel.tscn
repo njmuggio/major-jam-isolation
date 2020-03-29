@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=2]
+[gd_scene load_steps=12 format=2]
 
 [ext_resource path="res://music/life_in_corrupted_binary_01.ogg" type="AudioStream" id=1]
 [ext_resource path="res://MainLevel.gd" type="Script" id=2]
@@ -6,6 +6,7 @@
 [ext_resource path="res://mainTheme.tres" type="Theme" id=4]
 [ext_resource path="res://textures/consolePanel.png" type="Texture" id=5]
 [ext_resource path="res://textures/crosshair.png" type="Texture" id=6]
+[ext_resource path="res://MultiResource.tscn" type="PackedScene" id=7]
 [ext_resource path="res://Resource.tscn" type="PackedScene" id=10]
 [ext_resource path="res://Gimbal.tscn" type="PackedScene" id=11]
 
@@ -108,12 +109,19 @@ max_value = 10.0
 value = 1.0
 tick_count = 10
 
-[node name="TapeRes" parent="UiControl/VBoxContainer/HBoxContainer/VBoxContainer" instance=ExtResource( 10 )]
+[node name="TapeRes" parent="UiControl/VBoxContainer/HBoxContainer/VBoxContainer" instance=ExtResource( 7 )]
 anchor_right = 0.0
 anchor_bottom = 0.0
 margin_top = 76.0
 margin_right = 407.0
 margin_bottom = 80.0
+colors = {
+"Sensor0": Color( 0.560784, 0.85098, 0.796078, 1 ),
+"Sensor1": Color( 0.670588, 0.74902, 0.388235, 1 ),
+"Sensor2": Color( 0.94902, 0.721569, 0.447059, 1 ),
+"Sensor3": Color( 0.94902, 0.439216, 0.321569, 1 ),
+"Sensor4": Color( 0.85098, 0.313726, 0.262745, 1 )
+}
 
 [node name="BatRes" parent="UiControl/VBoxContainer/HBoxContainer/VBoxContainer" instance=ExtResource( 10 )]
 anchor_right = 0.0

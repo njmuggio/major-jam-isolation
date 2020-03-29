@@ -38,7 +38,7 @@ var yawMod = 0
 var count = 0
 var tickCount = 0
 var gameActive = true
-var batteryPower = 0
+#var batteryPower = 0
 
 
 # Called when the node enters the scene tree for the first time.
@@ -62,10 +62,10 @@ func _process(delta):
 		return
 	
 #	var msecRemaining = rtgLifetimeMsec - (OS.get_ticks_msec() - startTime)
-	rtgRes.value = rtgLifetimeTicks - tickCount
-	batRes.value = batteryPower
+#	rtgRes.value = rtgLifetimeTicks - tickCount
+#	batRes.value = batteryPower
 	
-	if batteryPower <= 0 and tickCount >= rtgLifetimeTicks:
+	if batRes.value <= 0 and tickCount >= rtgLifetimeTicks:
 		game_over()
 	
 	# https://docs.godotengine.org/en/3.2/tutorials/3d/using_transforms.html
@@ -73,11 +73,6 @@ func _process(delta):
 	var angle_to_earth = abs(rad2deg(targetBearing.angle_to(bearing)))
 	$UiControl/VBoxContainer/ViewportContainer.stretch_shrink = round(range_lerp(angle_to_earth, 0, 180, 1, 10))
 	$AudioStreamPlayer.pitch_scale = min(1.0, range_lerp(angle_to_earth, 30, 180, 1.0, 0.8))
-	
-	count += 1
-	if count % 10 == 0:
-		print(str(bearing) + ' ' + str(targetBearing))
-		print(angle_to_earth)
 	pass
 
 
@@ -87,16 +82,26 @@ func _physics_process(delta):
 	
 	tickCount += 1
 	
-	var powerGen = powerPerTick as float
-#	var msecRemaining = rtgLifetimeMsec - (OS.get_ticks_msec() - startTime)
-	if tickCount >= rtgLifetimeTicks:
-		powerGen = 0
-	var powerUsed = (abs(pitchMod) + abs(rollMod) + abs(yawMod)) * reactionWheelPowerUse + idlePowerUse
-	var powerFraction = 1.0
-	if powerUsed > 0:
-		powerFraction = clamp((batteryPower + powerGen) / (powerUsed), 0.0, 1.0)
-	batteryPower = clamp(batteryPower + (powerGen - powerUsed), 0, maxBatteryPower)
-		
+#	var powerGen = powerPerTick as float
+##	var msecRemaining = rtgLifetimeMsec - (OS.get_ticks_msec() - startTime)
+#	if tickCount >= rtgLifetimeTicks:
+#		powerGen = 0
+#	var powerUsed = (abs(pitchMod) + abs(rollMod) + abs(yawMod)) * reactionWheelPowerUse + idlePowerUse
+#	var powerFraction = 1.0
+#	if powerUsed > 0:
+#		powerFraction = clamp((batteryPower + powerGen) / (powerUsed), 0.0, 1.0)
+#	batteryPower = clamp(batteryPower + (powerGen - powerUsed), 0, maxBatteryPower)
+	
+	if rtgRes.value > 0:
+		batRes.apply(powerPerTick)
+	batRes.apply(-idlePowerUse)
+	var powerNeeded = (abs(pitchMod) + abs(rollMod) + abs(yawMod)) * reactionWheelPowerUse
+	var powerFraction = 0
+	if powerNeeded != 0:
+		var powerAvailable = batRes.request(powerNeeded)
+		powerFraction = powerAvailable / powerNeeded
+	rtgRes.apply(-1)
+	
 	pitchRate += pitchMod * rotAccel * delta * powerFraction
 	rollRate += rollMod * rotAccel * delta * powerFraction
 	yawRate += yawMod * rotAccel * delta * powerFraction
@@ -142,7 +147,6 @@ func start():
 	# Tape setup
 	tapeRes.minimum = 0
 	tapeRes.maximum = tapeSize
-	tapeRes.value = 0
 	
 	# Battery setup
 	batRes.minimum = 0

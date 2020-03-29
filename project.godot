@@ -8,9 +8,20 @@
 
 config_version=4
 
-_global_script_classes=[  ]
+_global_script_classes=[ {
+"base": "Control",
+"class": "MultiResource",
+"language": "GDScript",
+"path": "res://MultiResource.gd"
+}, {
+"base": "Control",
+"class": "SimpleResource",
+"language": "GDScript",
+"path": "res://Resource.gd"
+} ]
 _global_script_class_icons={
-
+"MultiResource": "",
+"SimpleResource": ""
 }
 
 [application]
