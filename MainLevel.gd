@@ -75,9 +75,9 @@ func _process(delta):
 	$AudioStreamPlayer.pitch_scale = min(1.0, range_lerp(angle_to_earth, 30, 180, 1.0, 0.8))
 	
 	count += 1
-	if count % 10 == 0:
-		print(str(bearing) + ' ' + str(targetBearing))
-		print(angle_to_earth)
+#	if count % 10 == 0:
+#		print(str(bearing) + ' ' + str(targetBearing))
+#		print(angle_to_earth)
 	pass
 
 
@@ -164,3 +164,18 @@ func game_over():
 	print("Game should end now")
 	gameActive = false
 	pass
+	
+# Per Sensor
+# State
+# On/Off
+# Store/Broadcast
+# Broadcast sends data from storage first, sends live data once storage
+#
+# Power/tick required
+# 'Science'/tick - Same for broadcast or store
+# Keep track of Science broadcast per sensor
+#
+# Call request power function -> power function returns whether or not sufficient power is available
+# Call request store function -> store function returns how much it was able to store
+#
+# Turn off sensors that don't receive full power

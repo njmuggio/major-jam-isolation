@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=2]
+[gd_scene load_steps=12 format=2]
 
 [ext_resource path="res://music/life_in_corrupted_binary_01.ogg" type="AudioStream" id=1]
 [ext_resource path="res://MainLevel.gd" type="Script" id=2]
@@ -6,6 +6,7 @@
 [ext_resource path="res://mainTheme.tres" type="Theme" id=4]
 [ext_resource path="res://textures/consolePanel.png" type="Texture" id=5]
 [ext_resource path="res://textures/crosshair.png" type="Texture" id=6]
+[ext_resource path="res://Sensor.tscn" type="PackedScene" id=7]
 [ext_resource path="res://Resource.tscn" type="PackedScene" id=10]
 [ext_resource path="res://Gimbal.tscn" type="PackedScene" id=11]
 
@@ -46,7 +47,7 @@ __meta__ = {
 margin_left = 4.0
 margin_top = 4.0
 margin_right = 508.0
-margin_bottom = 296.0
+margin_bottom = 444.0
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -97,16 +98,33 @@ margin_right = 407.0
 margin_bottom = 73.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
-columns = 2
+columns = 5
 
-[node name="HSlider" type="HSlider" parent="UiControl/VBoxContainer/HBoxContainer/VBoxContainer/GridContainer"]
-margin_right = 203.0
-margin_bottom = 16.0
-size_flags_horizontal = 3
-min_value = 1.0
-max_value = 10.0
-value = 1.0
-tick_count = 10
+[node name="Sensor0" parent="UiControl/VBoxContainer/HBoxContainer/VBoxContainer/GridContainer" instance=ExtResource( 7 )]
+
+[node name="Sensor1" parent="UiControl/VBoxContainer/HBoxContainer/VBoxContainer/GridContainer" instance=ExtResource( 7 )]
+margin_left = 82.0
+margin_right = 160.0
+sensorNumber = 1
+sensorColor = Color( 1, 0, 0, 1 )
+
+[node name="Sensor2" parent="UiControl/VBoxContainer/HBoxContainer/VBoxContainer/GridContainer" instance=ExtResource( 7 )]
+margin_left = 164.0
+margin_right = 242.0
+sensorNumber = 2
+sensorColor = Color( 0, 0, 1, 1 )
+
+[node name="Sensor3" parent="UiControl/VBoxContainer/HBoxContainer/VBoxContainer/GridContainer" instance=ExtResource( 7 )]
+margin_left = 246.0
+margin_right = 324.0
+sensorNumber = 3
+sensorColor = Color( 1, 0.513726, 0, 1 )
+
+[node name="Sensor4" parent="UiControl/VBoxContainer/HBoxContainer/VBoxContainer/GridContainer" instance=ExtResource( 7 )]
+margin_left = 328.0
+margin_right = 406.0
+sensorNumber = 4
+sensorColor = Color( 0.85098, 0, 1, 1 )
 
 [node name="TapeRes" parent="UiControl/VBoxContainer/HBoxContainer/VBoxContainer" instance=ExtResource( 10 )]
 anchor_right = 0.0
