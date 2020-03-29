@@ -9,8 +9,8 @@ export(Color) var sensorColor = Color.green
 export(bool) var enabled = false
 export(DataUsage) var usage = DataUsage.storage
 # Sensor Attributes
-export(float) var sciPerTick = 1.0
-export(float) var powerPerTick = 1.0
+export(int) var sciPerTick = 1
+export(int) var powerPerTick = 1
 export(Color) var disabledColor = Color.gray
 
 onready var powerButton = $EnabledButton
@@ -41,6 +41,9 @@ func _ready():
 	mainLevel = get_tree().root.get_node("Node2D")
 	SetEnabled(enabled)
 	SetUsage(usage)
+	$PowerStatus.value = powerPerTick
+	$ScienceStatus.value = sciPerTick
+	$BroadcastStatus.max_value = sciPerTick
 	pass
 
 
@@ -68,11 +71,10 @@ func _physics_process(delta):
 				# direct link will transmit up to sciPerTick based on available power
 				# main reports 'amount sci' sent and update blue bar
 				
-				var amount_to_send = int(mainLevel.signal_strength * sciPerTick)
-				if storageTape.fields["Sensor"+str(sensorNumber)].value >= amount_to_send:
-					storageTape.try_change_value("Sensor"+str(sensorNumber), -amount_to_send)
-				var amount_sent = mainLevel.transmit_broadcast(amount_to_send)
-				
+				# From Nick's stuff
+				var broadcastAmount = sciPerTick # Replace with actual broadcast amount
+				storageTape.try_change_value("Sensor"+str(sensorNumber), -sciPerTick)
+				$BroadcastStatus.value = broadcastAmount
 				
 		# Power down sensor if insufficient power
 		else:
