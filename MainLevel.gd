@@ -1,6 +1,6 @@
 extends Node2D
 
-var debug: bool = true
+var debug: bool = false
 
 const physicsFps = 60 # UPDATE THIS IF PHYSICS RATE GETS UPDATED - CAN'T READ A CONSTANT FROM PROJECT SETTINGS
 const gameMinutes = 1
@@ -10,7 +10,7 @@ const powerPerTick = 5
 const maxBatteryPower = 10000 * gameMinutes
 const idlePowerUse = 1
 const reactionWheelPowerUse = 10
-const tapeSize = 100 * gameMinutes
+const tapeSize = 1000 * gameMinutes
 
 onready var ship = $UiControl/VBoxContainer/ViewportContainer/Viewport/Spatial/Spatial/Satellite
 onready var gimbal = $UiControl/VBoxContainer/HBoxContainer/ViewportContainer/Viewport/Spatial/Gimbal
@@ -140,7 +140,7 @@ func start():
 	# Battery setup
 	batRes.minimum = 0
 	batRes.maximum = maxBatteryPower
-	batRes.value = 0
+	batRes.value = maxBatteryPower / 2
 	
 	# RTG setup
 	rtgRes.minimum = 0

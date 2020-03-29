@@ -11,6 +11,7 @@ export(DataUsage) var usage = DataUsage.storage
 # Sensor Attributes
 export(float) var sciPerTick = 1.0
 export(float) var powerPerTick = 1.0
+export(Color) var disabledColor = Color.gray
 
 onready var powerButton = $EnabledButton
 onready var storeButton = $StoreButton
@@ -18,7 +19,7 @@ onready var broadcastButton = $BroadcastButton
 var battery
 var storageTape
 
-var disabledColor = Color.gray
+
 
 # Broadcast sends data from storage first, sends live data once storage
 #

@@ -34,24 +34,10 @@ void fragment()
 		COLOR = c;
 		return;
 	}
-	
-//	if (mod(TIME, c[0]) < 0.1 || mod(TIME, c[0]) > 0.9)
-//	{
-//		c[0] = mix(c[0], 0.1, c[2]);
-//	}
-//
-//	if (mod(TIME, c[1]) < 0.1 || mod(TIME, c[1]) > 0.9)
-//	{
-//		c[1] = c[1] * c[0];
-//	}
 
-//	if (mod(seed, 1.0) > rand(SCREEN_UV))
 	float _rand = rand(SCREEN_UV);
 	if (_rand > seed - density && _rand < seed + density)
 	{
-//		c[0] = rand(vec2(seed, SCREEN_UV[1]));
-//		c[1] = rand(vec2(seed, SCREEN_UV[0]));
-//		c[2] = rand(vec2(SCREEN_UV[1], seed));
 		c[0] *= _rand * rand(vec2(seed, SCREEN_UV[1]));
 		c[1] *= _rand * rand(vec2(seed, SCREEN_UV[0]));
 		c[2] *= _rand * rand(vec2(SCREEN_UV[1], seed));
@@ -167,30 +153,35 @@ columns = 5
 
 [node name="Sensor0" parent="UiControl/VBoxContainer/HBoxContainer/VBoxContainer/GridContainer" instance=ExtResource( 8 )]
 sensorColor = Color( 0.560784, 0.85098, 0.796078, 1 )
+disabledColor = Color( 0.0901961, 0.0901961, 0.0941176, 1 )
 
 [node name="Sensor1" parent="UiControl/VBoxContainer/HBoxContainer/VBoxContainer/GridContainer" instance=ExtResource( 8 )]
 margin_left = 82.0
 margin_right = 160.0
 sensorNumber = 1
 sensorColor = Color( 0.670588, 0.74902, 0.388235, 1 )
+disabledColor = Color( 0.0901961, 0.0901961, 0.0941176, 1 )
 
 [node name="Sensor2" parent="UiControl/VBoxContainer/HBoxContainer/VBoxContainer/GridContainer" instance=ExtResource( 8 )]
 margin_left = 164.0
 margin_right = 242.0
 sensorNumber = 2
 sensorColor = Color( 0.94902, 0.721569, 0.447059, 1 )
+disabledColor = Color( 0.0901961, 0.0901961, 0.0941176, 1 )
 
 [node name="Sensor3" parent="UiControl/VBoxContainer/HBoxContainer/VBoxContainer/GridContainer" instance=ExtResource( 8 )]
 margin_left = 246.0
 margin_right = 324.0
 sensorNumber = 3
 sensorColor = Color( 0.94902, 0.439216, 0.321569, 1 )
+disabledColor = Color( 0.0901961, 0.0901961, 0.0941176, 1 )
 
 [node name="Sensor4" parent="UiControl/VBoxContainer/HBoxContainer/VBoxContainer/GridContainer" instance=ExtResource( 8 )]
 margin_left = 328.0
 margin_right = 406.0
 sensorNumber = 4
 sensorColor = Color( 0.85098, 0.313726, 0.262745, 1 )
+disabledColor = Color( 0.0901961, 0.0901961, 0.0941176, 1 )
 
 [node name="TapeRes" parent="UiControl/VBoxContainer/HBoxContainer/VBoxContainer" instance=ExtResource( 7 )]
 anchor_right = 0.0

@@ -61,6 +61,9 @@ size_flags_horizontal = 0
 size_flags_vertical = 0
 action_mode = 0
 texture_normal = ExtResource( 3 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
 [connection signal="pressed" from="EnabledButton" to="." method="_on_EnabledButton_pressed"]
 [connection signal="pressed" from="StoreButton" to="." method="_on_StoreButton_pressed"]
 [connection signal="pressed" from="BroadcastButton" to="." method="_on_BroadcastButton_pressed"]
