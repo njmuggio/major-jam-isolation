@@ -1,4 +1,5 @@
 extends Control
+class_name SimpleResource
 
 
 export(int) var minimum = 0 setget set_minimum
@@ -27,8 +28,30 @@ func _process(delta):
 # Add 'amt' to the value. This is executed immediately, instead of being added to the request queue.
 # Returns the new value.
 func apply(amt):
-	value += amt
+	var newVal = value + amt
+	if newVal >= minimum and newVal <= maximum:
+		value = newVal
 	return value
+
+
+# Try to reserve 'amt' of the resource. If available, this much is deducted from the count.
+# Returns true if 'amt' could be reserved, false otherwise
+func reserve(amt):
+	if value >= amt:
+		value -= amt
+		return true
+	return false
+
+
+# Attempt to reserve 'amt'. If there is not enough of the resource, return the amount available and value to 0.
+func request(amt):
+	if value > amt:
+		value -= amt
+		return amt
+	else:
+		amt = value
+		value = 0
+		return amt
 
 
 func set_minimum(val):

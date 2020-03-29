@@ -16,6 +16,8 @@ onready var ship = $UiControl/VBoxContainer/ViewportContainer/Viewport/Spatial/S
 onready var gimbal = $UiControl/VBoxContainer/HBoxContainer/ViewportContainer/Viewport/Spatial/Gimbal
 onready var satCluster = $UiControl/VBoxContainer/ViewportContainer/Viewport/Spatial/Spatial
 
+onready var noiseShader = $UiControl/VBoxContainer/ViewportContainer/ColorRect
+
 onready var targetBearing = ship.transform.basis.z
 #onready var tapeBar = $UiControl/VBoxContainer/HBoxContainer/VBoxContainer/TapeBar
 onready var tapeRes = $UiControl/VBoxContainer/HBoxContainer/VBoxContainer/TapeRes
@@ -36,9 +38,7 @@ var rollMod = 0
 var yawMod = 0
 
 var count = 0
-var tickCount = 0
 var gameActive = true
-var batteryPower = 0
 
 
 # Called when the node enters the scene tree for the first time.
@@ -53,31 +53,22 @@ func _ready():
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
-#	var sliderVal = $UiControl/VBoxContainer/HBoxContainer/GridContainer/HSlider.value
-#	$UiControl/VBoxContainer/ViewportContainer.stretch_shrink = sliderVal
-#	$UiControl/VBoxContainer/ViewportContainer.stretch_shrink = round(range_lerp(abs(rad2deg(Vector3(0, -1, 0).angle_to(ray.cast_to.rotated(Vector3(-1, 0, 0), deg2rad(90))))), 0, 180, 1, 10))
-	
 	if not gameActive:
 		$AudioStreamPlayer.pitch_scale = lerp($AudioStreamPlayer.pitch_scale, 0.5, delta)
 		return
 	
-#	var msecRemaining = rtgLifetimeMsec - (OS.get_ticks_msec() - startTime)
-	rtgRes.value = rtgLifetimeTicks - tickCount
-	batRes.value = batteryPower
-	
-	if batteryPower <= 0 and tickCount >= rtgLifetimeTicks:
+	if batRes.value <= 0 and rtgRes.value <= 0:
 		game_over()
+	
+	
 	
 	# https://docs.godotengine.org/en/3.2/tutorials/3d/using_transforms.html
 	var bearing = ship.transform.basis.z
 	var angle_to_earth = abs(rad2deg(targetBearing.angle_to(bearing)))
-	$UiControl/VBoxContainer/ViewportContainer.stretch_shrink = round(range_lerp(angle_to_earth, 0, 180, 1, 10))
+	noiseShader.material.set_shader_param("seed", randf())
+	noiseShader.material.set_shader_param("density", max(0.0, range_lerp(angle_to_earth, 30, 180, 0.0, 0.5)))
+	#$UiControl/VBoxContainer/ViewportContainer.stretch_shrink = round(range_lerp(angle_to_earth, 0, 180, 1, 10))
 	$AudioStreamPlayer.pitch_scale = min(1.0, range_lerp(angle_to_earth, 30, 180, 1.0, 0.8))
-	
-	count += 1
-#	if count % 10 == 0:
-#		print(str(bearing) + ' ' + str(targetBearing))
-#		print(angle_to_earth)
 	pass
 
 
@@ -85,18 +76,21 @@ func _physics_process(delta):
 	if not gameActive:
 		return
 	
-	tickCount += 1
+	if rtgRes.value > 0: # As long as RTG is alive, add power to battery
+		batRes.apply(powerPerTick)
+	batRes.apply(-idlePowerUse)
 	
-	var powerGen = powerPerTick as float
-#	var msecRemaining = rtgLifetimeMsec - (OS.get_ticks_msec() - startTime)
-	if tickCount >= rtgLifetimeTicks:
-		powerGen = 0
-	var powerUsed = (abs(pitchMod) + abs(rollMod) + abs(yawMod)) * reactionWheelPowerUse + idlePowerUse
-	var powerFraction = 1.0
-	if powerUsed > 0:
-		powerFraction = clamp((batteryPower + powerGen) / (powerUsed), 0.0, 1.0)
-	batteryPower = clamp(batteryPower + (powerGen - powerUsed), 0, maxBatteryPower)
-		
+	# Figure out power requested for rotation
+	var powerNeeded = (abs(pitchMod) + abs(rollMod) + abs(yawMod)) * reactionWheelPowerUse
+	var powerFraction = 0
+	if powerNeeded != 0:
+		# Get as much power as we can
+		var powerAvailable = batRes.request(powerNeeded)
+		powerFraction = powerAvailable / powerNeeded
+	
+	# Reduce RTG lifetime by one tick
+	rtgRes.apply(-1)
+	
 	pitchRate += pitchMod * rotAccel * delta * powerFraction
 	rollRate += rollMod * rotAccel * delta * powerFraction
 	yawRate += yawMod * rotAccel * delta * powerFraction
@@ -142,7 +136,6 @@ func start():
 	# Tape setup
 	tapeRes.minimum = 0
 	tapeRes.maximum = tapeSize
-	tapeRes.value = 0
 	
 	# Battery setup
 	batRes.minimum = 0
@@ -155,7 +148,6 @@ func start():
 	rtgRes.value = rtgLifetimeTicks
 	
 	# Init game
-	tickCount = 0
 	gameActive = true
 	pass
 

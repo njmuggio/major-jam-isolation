@@ -1,0 +1,24 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://textures/resBarBack.png" type="Texture" id=2]
+[ext_resource path="res://MultiResource.gd" type="Script" id=3]
+
+[node name="MultiResource" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_right = -617.0
+margin_bottom = -596.0
+rect_min_size = Vector2( 407, 4 )
+script = ExtResource( 3 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="TextureRect" type="TextureRect" parent="."]
+margin_right = 407.0
+margin_bottom = 4.0
+rect_min_size = Vector2( 407, 4 )
+texture = ExtResource( 2 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
