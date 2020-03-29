@@ -4,6 +4,7 @@ enum DataUsage { storage, broadcast}
 
 # Sensor Configuration
 export(int) var sensorNumber = 0
+export(Texture) var sensorTexture
 export(Color) var sensorColor = Color.green
 # Sensor State
 export(bool) var enabled = false
@@ -44,6 +45,8 @@ func _ready():
 	$PowerStatus.value = powerPerTick
 	$ScienceStatus.value = sciPerTick
 	$BroadcastStatus.max_value = sciPerTick
+	if sensorTexture != null:
+		$SensorTexture.texture = sensorTexture
 	pass
 
 
