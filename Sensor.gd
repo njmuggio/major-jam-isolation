@@ -9,8 +9,8 @@ export(Color) var sensorColor = Color.green
 export(bool) var enabled = false
 export(DataUsage) var usage = DataUsage.storage
 # Sensor Attributes
-export(float) var sciPerTick = 1.0
-export(float) var powerPerTick = 1.0
+export(int) var sciPerTick = 1
+export(int) var powerPerTick = 1
 export(Color) var disabledColor = Color.gray
 
 onready var powerButton = $EnabledButton
@@ -18,6 +18,7 @@ onready var storeButton = $StoreButton
 onready var broadcastButton = $BroadcastButton
 var battery
 var storageTape
+var lastBroadcastAmount: int
 
 
 
@@ -39,6 +40,8 @@ func _ready():
 	storageTape = get_parent().get_parent().get_node("TapeRes")
 	SetEnabled(enabled)
 	SetUsage(usage)
+	$PowerStatus.value = powerPerTick
+	$ScienceStatus.value = sciPerTick
 	pass
 
 
@@ -55,7 +58,9 @@ func _physics_process(delta):
 			else:
 				# SciAmount? += sciPerTick
 				# 'Broadcast' from stored data first
+				var broadcastAmount = sciPerTick # Replace with actual broadcast amount
 				storageTape.try_change_value("Sensor"+str(sensorNumber), -sciPerTick)
+				$BroadcastStatus.value = broadcastAmount
 				
 		# Power down sensor if insufficient power
 		else:
