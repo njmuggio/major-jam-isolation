@@ -40,7 +40,7 @@ var yawMod = 0
 var count = 0
 var gameActive = true
 
-var powerPerSci = 30
+var powerPerSci = 3
 var totalSciTransmitted = 0
 
 
