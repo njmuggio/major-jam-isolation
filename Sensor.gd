@@ -18,6 +18,7 @@ onready var storeButton = $StoreButton
 onready var broadcastButton = $BroadcastButton
 var battery
 var storageTape
+var mainLevel
 
 
 
@@ -37,6 +38,7 @@ var storageTape
 func _ready():
 	battery = get_parent().get_parent().get_node("BatRes")
 	storageTape = get_parent().get_parent().get_node("TapeRes")
+	mainLevel = get_tree().root.get_node("Node2D")
 	SetEnabled(enabled)
 	SetUsage(usage)
 	pass
@@ -55,7 +57,22 @@ func _physics_process(delta):
 			else:
 				# SciAmount? += sciPerTick
 				# 'Broadcast' from stored data first
-				storageTape.try_change_value("Sensor"+str(sensorNumber), -sciPerTick)
+				# query storage, do I have > 0
+				# use that amount or sciPerTick, whichever is smaller
+				# if storage is empty, then also send sciPerTick
+				# tell main to TRY to broadcast that amount
+				# main checks power needed to transmit that amount of sci (based on angle)
+				# have base Powerpersci (if within 30 degrees), scale up to 10x until 100 degrees, after that always deny transmission
+				# main will need to know storage/broadcast
+				# storage will transmit all data at variable power
+				# direct link will transmit up to sciPerTick based on available power
+				# main reports 'amount sci' sent and update blue bar
+				
+				var amount_to_send = int(mainLevel.signal_strength * sciPerTick)
+				if storageTape.fields["Sensor"+str(sensorNumber)].value >= amount_to_send:
+					storageTape.try_change_value("Sensor"+str(sensorNumber), -amount_to_send)
+				var amount_sent = mainLevel.transmit_broadcast(amount_to_send)
+				
 				
 		# Power down sensor if insufficient power
 		else:

@@ -40,6 +40,8 @@ var yawMod = 0
 var count = 0
 var gameActive = true
 
+var totalSciTransmitted = 0
+
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -157,6 +159,17 @@ func game_over():
 	gameActive = false
 	pass
 	
+func signal_strength():
+	var angle_to_earth = abs(rad2deg(targetBearing.angle_to(ship.transform.basis.z)))
+	if angle_to_earth > 100:
+		return 0
+	else:
+		return 1.0 - (angle_to_earth / 100.0)
+	
+func transmit_broadcast(sciAmount):
+	totalSciTransmitted += sciAmount
+	print("Broadcasting " + str(sciAmount) + " units of SCIENCE!")
+	pass
 # Per Sensor
 # State
 # On/Off

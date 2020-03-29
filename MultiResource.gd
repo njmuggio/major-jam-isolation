@@ -61,10 +61,12 @@ func __set_value(key: String, val: int):
 
 
 # Try to update the value associated with 'key' by adding 'amt'.
-# Returns true if the total sum is <= maximum, false otherwise.
+# Returns true if the total sum is <= maximum and the field's value would not become negative, false otherwise.
 func try_change_value(key: String, amt: int):
 	var sum = 0
 	var val = null
+	if fields.has(key) && fields[key].value <= 0 && amt < 0:
+		return false
 	for field in fields:
 		sum += fields[field].value
 		if field == key:
