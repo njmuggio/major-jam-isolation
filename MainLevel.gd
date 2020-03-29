@@ -16,6 +16,8 @@ onready var ship = $UiControl/VBoxContainer/ViewportContainer/Viewport/Spatial/S
 onready var gimbal = $UiControl/VBoxContainer/HBoxContainer/ViewportContainer/Viewport/Spatial/Gimbal
 onready var satCluster = $UiControl/VBoxContainer/ViewportContainer/Viewport/Spatial/Spatial
 
+onready var noiseShader = $UiControl/VBoxContainer/ViewportContainer/ColorRect
+
 onready var targetBearing = ship.transform.basis.z
 #onready var tapeBar = $UiControl/VBoxContainer/HBoxContainer/VBoxContainer/TapeBar
 onready var tapeRes = $UiControl/VBoxContainer/HBoxContainer/VBoxContainer/TapeRes
@@ -58,10 +60,14 @@ func _process(delta):
 	if batRes.value <= 0 and rtgRes.value <= 0:
 		game_over()
 	
+	
+	
 	# https://docs.godotengine.org/en/3.2/tutorials/3d/using_transforms.html
 	var bearing = ship.transform.basis.z
 	var angle_to_earth = abs(rad2deg(targetBearing.angle_to(bearing)))
-	$UiControl/VBoxContainer/ViewportContainer.stretch_shrink = round(range_lerp(angle_to_earth, 0, 180, 1, 10))
+	noiseShader.material.set_shader_param("seed", randf())
+	noiseShader.material.set_shader_param("density", max(0.0, range_lerp(angle_to_earth, 30, 180, 0.0, 0.5)))
+	#$UiControl/VBoxContainer/ViewportContainer.stretch_shrink = round(range_lerp(angle_to_earth, 0, 180, 1, 10))
 	$AudioStreamPlayer.pitch_scale = min(1.0, range_lerp(angle_to_earth, 30, 180, 1.0, 0.8))
 	pass
 
