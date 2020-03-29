@@ -42,6 +42,7 @@ func _ready():
 	SetUsage(usage)
 	$PowerStatus.value = powerPerTick
 	$ScienceStatus.value = sciPerTick
+	$BroadcastStatus.max_value = sciPerTick
 	pass
 
 
