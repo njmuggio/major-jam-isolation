@@ -55,7 +55,8 @@ func __set_value(key: String, val: int):
 		print(str(key) + " has not been registered as a key")
 		print_stack()
 		return 0
-	
+	if val < 0:
+		val = 0	
 	fields[key].value = val
 
 
