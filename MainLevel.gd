@@ -1,6 +1,6 @@
 extends Node2D
 
-var debug: bool = false
+var debug: bool = true
 
 const physicsFps = 60 # UPDATE THIS IF PHYSICS RATE GETS UPDATED - CAN'T READ A CONSTANT FROM PROJECT SETTINGS
 const gameMinutes = 1
@@ -40,6 +40,7 @@ var yawMod = 0
 var count = 0
 var gameActive = true
 
+var powerPerSci = 30
 var totalSciTransmitted = 0
 
 
@@ -142,7 +143,7 @@ func start():
 	# Battery setup
 	batRes.minimum = 0
 	batRes.maximum = maxBatteryPower
-	batRes.value = maxBatteryPower / 2
+	batRes.value = int(maxBatteryPower / 2.0)
 	
 	# RTG setup
 	rtgRes.minimum = 0
@@ -158,29 +159,30 @@ func game_over():
 	print("Game should end now")
 	gameActive = false
 	pass
-	
-func signal_strength():
+
+
+func try_broadcast(sciAmount, directLink):
 	var angle_to_earth = abs(rad2deg(targetBearing.angle_to(ship.transform.basis.z)))
+	var powerNeeded = 0
+	var powerAvailable = batRes.value
+	
+	# Check power needed to transmit requested amount
 	if angle_to_earth > 100:
 		return 0
+	elif angle_to_earth < 30:
+		powerNeeded = powerPerSci * sciAmount
 	else:
-		return 1.0 - (angle_to_earth / 100.0)
+		powerNeeded = ((4*(angle_to_earth - 30)/70.0) + 1) * powerPerSci * sciAmount
 	
-func transmit_broadcast(sciAmount):
-	totalSciTransmitted += sciAmount
-	print("Broadcasting " + str(sciAmount) + " units of SCIENCE!")
-	pass
-# Per Sensor
-# State
-# On/Off
-# Store/Broadcast
-# Broadcast sends data from storage first, sends live data once storage
-#
-# Power/tick required
-# 'Science'/tick - Same for broadcast or store
-# Keep track of Science broadcast per sensor
-#
-# Call request power function -> power function returns whether or not sufficient power is available
-# Call request store function -> store function returns how much it was able to store
-#
-# Turn off sensors that don't receive full power
+	if batRes.reserve(powerNeeded):
+		totalSciTransmitted += sciAmount
+		return sciAmount
+	elif directLink:
+		# Should drain the battery
+		batRes.reserve(powerAvailable)
+		var sciSent = (powerAvailable / powerNeeded) * sciAmount
+		print("Direct Link at low power: sent " + str(sciSent) + " instead of " + str(sciAmount))
+		totalSciTransmitted += sciSent
+		return sciSent
+	else:
+		return 0

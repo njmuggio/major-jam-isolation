@@ -48,7 +48,7 @@ func _ready():
 
 
 # Called every physics tick. 'delta' is the elapsed time since the previous frame.
-func _physics_process(delta):
+func _physics_process(_delta):
 	if enabled:
 		# Request Power
 		if battery.reserve(powerPerTick):
@@ -58,22 +58,16 @@ func _physics_process(delta):
 					SetEnabled(false)
 				
 			else:
-				# SciAmount? += sciPerTick
-				# 'Broadcast' from stored data first
-				# query storage, do I have > 0
-				# use that amount or sciPerTick, whichever is smaller
-				# if storage is empty, then also send sciPerTick
-				# tell main to TRY to broadcast that amount
-				# main checks power needed to transmit that amount of sci (based on angle)
-				# have base Powerpersci (if within 30 degrees), scale up to 10x until 100 degrees, after that always deny transmission
-				# main will need to know storage/broadcast
-				# storage will transmit all data at variable power
-				# direct link will transmit up to sciPerTick based on available power
-				# main reports 'amount sci' sent and update blue bar
-				
-				# From Nick's stuff
-				var broadcastAmount = sciPerTick # Replace with actual broadcast amount
-				storageTape.try_change_value("Sensor"+str(sensorNumber), -sciPerTick)
+				var sciToSend = storageTape.get_value("Sensor"+str(sensorNumber))
+				var directLink = false
+				if sciToSend <= 0:
+					directLink = true
+					sciToSend = sciPerTick
+				elif sciToSend > sciPerTick:
+					sciToSend = sciPerTick
+				var broadcastAmount = mainLevel.try_broadcast(sciToSend, directLink)
+				if !directLink:
+					storageTape.try_change_value("Sensor"+str(sensorNumber), -broadcastAmount)
 				$BroadcastStatus.value = broadcastAmount
 				
 		# Power down sensor if insufficient power
