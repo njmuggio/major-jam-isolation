@@ -27,6 +27,14 @@ onready var batRes = $UiControl/VBoxContainer/HBoxContainer/VBoxContainer/BatRes
 onready var rtgRes = $UiControl/VBoxContainer/HBoxContainer/VBoxContainer/RtgRes
 onready var gimbalTransform = gimbal.transform
 
+onready var sensors = [
+	$UiControl/VBoxContainer/HBoxContainer/VBoxContainer/GridContainer/Sensor0,
+	$UiControl/VBoxContainer/HBoxContainer/VBoxContainer/GridContainer/Sensor1,
+	$UiControl/VBoxContainer/HBoxContainer/VBoxContainer/GridContainer/Sensor2,
+	$UiControl/VBoxContainer/HBoxContainer/VBoxContainer/GridContainer/Sensor3,
+	$UiControl/VBoxContainer/HBoxContainer/VBoxContainer/GridContainer/Sensor4
+]
+
 var rollRate = PI * -0.01
 var pitchRate = PI * 0.01
 var yawRate = PI * 0.01
@@ -46,6 +54,7 @@ var totalSciTransmitted = 0
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
+	randomize()
 	if debug:
 		rollRate = 0
 		pitchRate = 0
@@ -149,6 +158,11 @@ func start():
 	rtgRes.minimum = 0
 	rtgRes.maximum = rtgLifetimeTicks
 	rtgRes.value = rtgLifetimeTicks
+	
+	# Randomize sensor params
+	for sensor in sensors:
+		sensor.sciPerTick = randi() % 13 + 1
+		sensor.powerPerTick = randi() % 13 + 1
 	
 	# Init game
 	gameActive = true
