@@ -1,0 +1,66 @@
+[gd_scene load_steps=6 format=2]
+
+[ext_resource path="res://textures/sensorTemplate.png" type="Texture" id=1]
+[ext_resource path="res://textures/saveIcon.png" type="Texture" id=2]
+[ext_resource path="res://textures/broadcastIcon.png" type="Texture" id=3]
+[ext_resource path="res://textures/enabledIcon.png" type="Texture" id=4]
+[ext_resource path="res://Sensor.gd" type="Script" id=5]
+
+[node name="Sensor" type="Control"]
+margin_right = 78.0
+margin_bottom = 71.0
+rect_min_size = Vector2( 78, 71 )
+size_flags_horizontal = 0
+size_flags_vertical = 0
+script = ExtResource( 5 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="SensorTexture" type="TextureRect" parent="."]
+margin_right = 78.0
+margin_bottom = 39.0
+size_flags_horizontal = 0
+size_flags_vertical = 0
+texture = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="EnabledButton" type="TextureButton" parent="."]
+margin_left = 0.0702209
+margin_top = 40.0
+margin_right = 78.0702
+margin_bottom = 54.1117
+size_flags_horizontal = 0
+size_flags_vertical = 0
+action_mode = 0
+texture_normal = ExtResource( 4 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="StoreButton" type="TextureButton" parent="."]
+margin_top = 56.0
+margin_right = 38.0
+margin_bottom = 15.0
+size_flags_horizontal = 0
+size_flags_vertical = 0
+action_mode = 0
+texture_normal = ExtResource( 2 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="BroadcastButton" type="TextureButton" parent="."]
+margin_left = 40.0948
+margin_top = 56.0
+margin_right = 38.0
+margin_bottom = 15.0
+size_flags_horizontal = 0
+size_flags_vertical = 0
+action_mode = 0
+texture_normal = ExtResource( 3 )
+[connection signal="pressed" from="EnabledButton" to="." method="_on_EnabledButton_pressed"]
+[connection signal="pressed" from="StoreButton" to="." method="_on_StoreButton_pressed"]
+[connection signal="pressed" from="BroadcastButton" to="." method="_on_BroadcastButton_pressed"]

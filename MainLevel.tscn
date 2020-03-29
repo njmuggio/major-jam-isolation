@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=2]
+[gd_scene load_steps=15 format=2]
 
 [ext_resource path="res://music/life_in_corrupted_binary_01.ogg" type="AudioStream" id=1]
 [ext_resource path="res://MainLevel.gd" type="Script" id=2]
@@ -6,15 +6,76 @@
 [ext_resource path="res://mainTheme.tres" type="Theme" id=4]
 [ext_resource path="res://textures/consolePanel.png" type="Texture" id=5]
 [ext_resource path="res://textures/crosshair.png" type="Texture" id=6]
+[ext_resource path="res://MultiResource.tscn" type="PackedScene" id=7]
+[ext_resource path="res://Sensor.tscn" type="PackedScene" id=8]
 [ext_resource path="res://Resource.tscn" type="PackedScene" id=10]
 [ext_resource path="res://Gimbal.tscn" type="PackedScene" id=11]
 
-[sub_resource type="Environment" id=1]
+[sub_resource type="Shader" id=1]
+code = "shader_type canvas_item;
+
+uniform float seed;
+uniform float density;
+uniform float noise1;
+uniform float noise2;
+uniform float noise3;
+
+float rand(vec2 coords)
+{
+	return fract(sin(dot(coords.xy, vec2(noise1, noise2))) * noise3);
+}
+
+void fragment()
+{
+	vec4 c = textureLod(SCREEN_TEXTURE, SCREEN_UV, 0.0).rgba;
+	
+	if (density == 0.0)
+	{
+		COLOR = c;
+		return;
+	}
+	
+//	if (mod(TIME, c[0]) < 0.1 || mod(TIME, c[0]) > 0.9)
+//	{
+//		c[0] = mix(c[0], 0.1, c[2]);
+//	}
+//
+//	if (mod(TIME, c[1]) < 0.1 || mod(TIME, c[1]) > 0.9)
+//	{
+//		c[1] = c[1] * c[0];
+//	}
+
+//	if (mod(seed, 1.0) > rand(SCREEN_UV))
+	float _rand = rand(SCREEN_UV);
+	if (_rand > seed - density && _rand < seed + density)
+	{
+//		c[0] = rand(vec2(seed, SCREEN_UV[1]));
+//		c[1] = rand(vec2(seed, SCREEN_UV[0]));
+//		c[2] = rand(vec2(SCREEN_UV[1], seed));
+		c[0] *= _rand * rand(vec2(seed, SCREEN_UV[1]));
+		c[1] *= _rand * rand(vec2(seed, SCREEN_UV[0]));
+		c[2] *= _rand * rand(vec2(SCREEN_UV[1], seed));
+		c[3] *= density;
+	}
+	
+	COLOR.rgba = c;
+}
+"
+
+[sub_resource type="ShaderMaterial" id=2]
+shader = SubResource( 1 )
+shader_param/seed = 0.251
+shader_param/density = 0.089
+shader_param/noise1 = 39.561
+shader_param/noise2 = 11.655
+shader_param/noise3 = 55125.5
+
+[sub_resource type="Environment" id=3]
 ambient_light_color = Color( 0.760784, 0.537255, 0.113725, 1 )
 ambient_light_energy = 0.49
 
-[sub_resource type="World" id=2]
-environment = SubResource( 1 )
+[sub_resource type="World" id=4]
+environment = SubResource( 3 )
 
 [node name="Node2D" type="Node2D"]
 script = ExtResource( 2 )
@@ -64,6 +125,11 @@ render_target_update_mode = 3
 
 [node name="Spatial" parent="UiControl/VBoxContainer/ViewportContainer/Viewport" instance=ExtResource( 3 )]
 
+[node name="ColorRect" type="ColorRect" parent="UiControl/VBoxContainer/ViewportContainer"]
+material = SubResource( 2 )
+margin_right = 504.0
+margin_bottom = 195.0
+
 [node name="HBoxContainer" type="HBoxContainer" parent="UiControl/VBoxContainer"]
 margin_top = 198.0
 margin_right = 504.0
@@ -80,7 +146,7 @@ rect_min_size = Vector2( 94, 94 )
 [node name="Viewport" type="Viewport" parent="UiControl/VBoxContainer/HBoxContainer/ViewportContainer"]
 size = Vector2( 94, 94 )
 own_world = true
-world = SubResource( 2 )
+world = SubResource( 4 )
 handle_input_locally = false
 render_target_update_mode = 3
 
@@ -97,23 +163,48 @@ margin_right = 407.0
 margin_bottom = 73.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
-columns = 2
+columns = 5
 
-[node name="HSlider" type="HSlider" parent="UiControl/VBoxContainer/HBoxContainer/VBoxContainer/GridContainer"]
-margin_right = 203.0
-margin_bottom = 16.0
-size_flags_horizontal = 3
-min_value = 1.0
-max_value = 10.0
-value = 1.0
-tick_count = 10
+[node name="Sensor0" parent="UiControl/VBoxContainer/HBoxContainer/VBoxContainer/GridContainer" instance=ExtResource( 8 )]
+sensorColor = Color( 0.560784, 0.85098, 0.796078, 1 )
 
-[node name="TapeRes" parent="UiControl/VBoxContainer/HBoxContainer/VBoxContainer" instance=ExtResource( 10 )]
+[node name="Sensor1" parent="UiControl/VBoxContainer/HBoxContainer/VBoxContainer/GridContainer" instance=ExtResource( 8 )]
+margin_left = 82.0
+margin_right = 160.0
+sensorNumber = 1
+sensorColor = Color( 0.670588, 0.74902, 0.388235, 1 )
+
+[node name="Sensor2" parent="UiControl/VBoxContainer/HBoxContainer/VBoxContainer/GridContainer" instance=ExtResource( 8 )]
+margin_left = 164.0
+margin_right = 242.0
+sensorNumber = 2
+sensorColor = Color( 0.94902, 0.721569, 0.447059, 1 )
+
+[node name="Sensor3" parent="UiControl/VBoxContainer/HBoxContainer/VBoxContainer/GridContainer" instance=ExtResource( 8 )]
+margin_left = 246.0
+margin_right = 324.0
+sensorNumber = 3
+sensorColor = Color( 0.94902, 0.439216, 0.321569, 1 )
+
+[node name="Sensor4" parent="UiControl/VBoxContainer/HBoxContainer/VBoxContainer/GridContainer" instance=ExtResource( 8 )]
+margin_left = 328.0
+margin_right = 406.0
+sensorNumber = 4
+sensorColor = Color( 0.85098, 0.313726, 0.262745, 1 )
+
+[node name="TapeRes" parent="UiControl/VBoxContainer/HBoxContainer/VBoxContainer" instance=ExtResource( 7 )]
 anchor_right = 0.0
 anchor_bottom = 0.0
 margin_top = 76.0
 margin_right = 407.0
 margin_bottom = 80.0
+colors = {
+"Sensor0": Color( 0.560784, 0.85098, 0.796078, 1 ),
+"Sensor1": Color( 0.670588, 0.74902, 0.388235, 1 ),
+"Sensor2": Color( 0.94902, 0.721569, 0.447059, 1 ),
+"Sensor3": Color( 0.94902, 0.439216, 0.321569, 1 ),
+"Sensor4": Color( 0.85098, 0.313726, 0.262745, 1 )
+}
 
 [node name="BatRes" parent="UiControl/VBoxContainer/HBoxContainer/VBoxContainer" instance=ExtResource( 10 )]
 anchor_right = 0.0
