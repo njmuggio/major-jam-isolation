@@ -26,6 +26,8 @@ onready var batRes = $UiControl/VBoxContainer/HBoxContainer/VBoxContainer/BatRes
 #onready var rtgBar = $UiControl/VBoxContainer/HBoxContainer/VBoxContainer/RtgBar
 onready var rtgRes = $UiControl/VBoxContainer/HBoxContainer/VBoxContainer/RtgRes
 onready var gimbalTransform = gimbal.transform
+onready var totalSciText = $UiControl/VBoxContainer/ViewportContainer/TotalSciLabel
+onready var lifetimeText = $UiControl/VBoxContainer/ViewportContainer/LifetimeLabel
 
 var rollRate = PI * -0.01
 var pitchRate = PI * 0.01
@@ -42,6 +44,8 @@ var gameActive = true
 
 var powerPerSci = 3
 var totalSciTransmitted = 0
+var startTime = 0
+var currentTime = 0
 
 
 # Called when the node enters the scene tree for the first time.
@@ -72,6 +76,15 @@ func _process(delta):
 	noiseShader.material.set_shader_param("density", max(0.0, range_lerp(angle_to_earth, 30, 180, 0.0, 0.5)))
 	#$UiControl/VBoxContainer/ViewportContainer.stretch_shrink = round(range_lerp(angle_to_earth, 0, 180, 1, 10))
 	$AudioStreamPlayer.pitch_scale = min(1.0, range_lerp(angle_to_earth, 30, 180, 1.0, 0.8))
+	
+	# Update Lifetime counter
+	currentTime = OS.get_unix_time()
+	var elapsed = currentTime - startTime
+	var minutes = elapsed / 60
+	var seconds = elapsed % 60
+	var timeStr = "%02d : %02d" % [minutes, seconds]
+	lifetimeText.text = "Lifetime: " + timeStr
+	totalSciText.text = "Total Science Downlinked: %.2f" % totalSciTransmitted
 	pass
 
 
@@ -152,6 +165,7 @@ func start():
 	
 	# Init game
 	gameActive = true
+	startTime = OS.get_unix_time()
 	pass
 
 
