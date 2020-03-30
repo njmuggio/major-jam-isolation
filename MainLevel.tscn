@@ -51,8 +51,8 @@ void fragment()
 
 [sub_resource type="ShaderMaterial" id=2]
 shader = SubResource( 1 )
-shader_param/seed = 0.251
-shader_param/density = 0.089
+shader_param/seed = 0.0
+shader_param/density = 0.0
 shader_param/noise1 = 39.561
 shader_param/noise2 = 11.655
 shader_param/noise3 = 55125.5
