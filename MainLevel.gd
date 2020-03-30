@@ -3,7 +3,7 @@ extends Node2D
 var debug: bool = false
 
 const physicsFps = 60 # UPDATE THIS IF PHYSICS RATE GETS UPDATED - CAN'T READ A CONSTANT FROM PROJECT SETTINGS
-const gameMinutes = 2
+const gameMinutes = 0.2
 #const rtgLifetimeMsec = 60 * 1000 * gameMinutes
 const rtgLifetimeTicks = gameMinutes * 60 * physicsFps
 const powerPerTick = 5
@@ -36,16 +36,16 @@ onready var sensors = [
 ]
 
 onready var sensorTexes = [
-	load("res://textures/sensors/icons_decay.png"),
-	load("res://textures/sensors/icons_happi.png"),
-	load("res://textures/sensors/icons_heat.png"),
-	load("res://textures/sensors/icons_immDes.png"),
-	load("res://textures/sensors/icons_pineapple.png"),
-	load("res://textures/sensors/icons_radiation.png"),
-	load("res://textures/sensors/icons_radio.png"),
-	load("res://textures/sensors/icons_spectro.png"),
-#	load("res://textures/sensors/icons_ufo1.png"),
-	load("res://textures/sensors/icons_ufo2.png")
+	preload("res://textures/sensors/icons_decay.png"),
+	preload("res://textures/sensors/icons_happi.png"),
+	preload("res://textures/sensors/icons_heat.png"),
+	preload("res://textures/sensors/icons_immDes.png"),
+	preload("res://textures/sensors/icons_pineapple.png"),
+	preload("res://textures/sensors/icons_radiation.png"),
+	preload("res://textures/sensors/icons_radio.png"),
+	preload("res://textures/sensors/icons_spectro.png"),
+#	preload("res://textures/sensors/icons_ufo1.png"),
+	preload("res://textures/sensors/icons_ufo2.png")
 ]
 
 var rollRate = PI * -0.01
@@ -57,6 +57,8 @@ var rotAccel = 0.60
 var pitchMod = 0
 var rollMod = 0
 var yawMod = 0
+
+var gameOverWorldRate = 1.0
 
 var count = 0
 var gameActive = false
@@ -78,10 +80,18 @@ func _ready():
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta):
+func _process(_delta):
+	var bearing = ship.transform.basis.z
+	var angle_to_earth = abs(rad2deg(targetBearing.angle_to(bearing)))
+	noiseShader.material.set_shader_param("seed", randf())
+	noiseShader.material.set_shader_param("density", max(0.0, range_lerp(angle_to_earth, 30, 180, 0.0, 0.5)))
+	noiseShader.material.set_shader_param("noise1", rand_range(35, 45))
+	noiseShader.material.set_shader_param("noise2", rand_range(10, 20))
+	noiseShader.material.set_shader_param("noise3", rand_range(45000, 65000))
+	
 	if not gameActive:
 		if gameOver:
-			$AudioStreamPlayer.pitch_scale = lerp($AudioStreamPlayer.pitch_scale, 0.5, delta)
+			$AudioStreamPlayer.pitch_scale = gameOverWorldRate#lerp(gameOverWorldRate, 0.5, delta)
 		return
 	
 	if batRes.value <= 0 and rtgRes.value <= 0:
@@ -92,10 +102,7 @@ func _process(delta):
 	$LifetimeLbl.text = "Lifetime: %d days" % (totalLifetime / 10)
 	
 	# https://docs.godotengine.org/en/3.2/tutorials/3d/using_transforms.html
-	var bearing = ship.transform.basis.z
-	var angle_to_earth = abs(rad2deg(targetBearing.angle_to(bearing)))
-	noiseShader.material.set_shader_param("seed", randf())
-	noiseShader.material.set_shader_param("density", max(0.0, range_lerp(angle_to_earth, 30, 180, 0.0, 0.5)))
+	
 #	$UiControl/VBoxContainer/ViewportContainer.stretch_shrink = round(range_lerp(angle_to_earth, 0, 180, 1, 10))
 	$AudioStreamPlayer.pitch_scale = min(1.0, range_lerp(angle_to_earth, 30, 180, 1.0, 0.8))
 	pass
@@ -105,6 +112,11 @@ func _physics_process(delta):
 	if not gameActive:
 		if Input.is_action_just_pressed("ui_accept"):
 			start()
+		elif gameOver:
+			gameOverWorldRate = lerp(gameOverWorldRate, 0.5, delta)
+			ship.rotate_x(pitchRate * delta * gameOverWorldRate)
+			ship.rotate_y(rollRate * delta * gameOverWorldRate)
+			ship.rotate_z(yawRate * delta * gameOverWorldRate)
 		return
 	
 	if rtgRes.value > 0: # As long as RTG is alive, add power to battery
@@ -194,8 +206,7 @@ func start():
 	var selections = []
 	for i in range(sensorTexes.size()):
 		selections.append(i)
-# warning-ignore:unused_variable
-	for i in range(selections.size() - 5):
+	for _i in range(selections.size() - 5):
 		selections.remove(randi() % selections.size())
 	for i in range(selections.size()):
 		var other = randi() % selections.size()
@@ -204,6 +215,11 @@ func start():
 		selections[i] = t
 	for i in range(selections.size()):
 		sensors[i].sensorTexture = sensorTexes[selections[i]]
+	
+	# Random starting velocity
+	rollRate = PI * rand_range(-0.02, 0.02)
+	pitchRate = PI * rand_range(-0.02, 0.02)
+	yawRate = PI * rand_range(-0.02, 0.02)
 	
 	# Init game
 	totalLifetime = 0
@@ -214,6 +230,7 @@ func start():
 
 func game_over():
 	$StartLabel.visible = true
+	gameOverWorldRate = 1.0
 	gameActive = false
 	gameOver = true
 	pass
