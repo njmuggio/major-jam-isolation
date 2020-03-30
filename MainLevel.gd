@@ -3,7 +3,7 @@ extends Node2D
 var debug: bool = false
 
 const physicsFps = 60 # UPDATE THIS IF PHYSICS RATE GETS UPDATED - CAN'T READ A CONSTANT FROM PROJECT SETTINGS
-const gameMinutes = 0.2
+const gameMinutes = 1
 #const rtgLifetimeMsec = 60 * 1000 * gameMinutes
 const rtgLifetimeTicks = gameMinutes * 60 * physicsFps
 const powerPerTick = 5
@@ -18,6 +18,7 @@ onready var satCluster = $UiControl/VBoxContainer/ViewportContainer/Viewport/Spa
 
 onready var noiseShader = $UiControl/VBoxContainer/ViewportContainer/ColorRect
 
+onready var initialTransform = ship.transform
 onready var targetBearing = ship.transform.basis.z
 #onready var tapeBar = $UiControl/VBoxContainer/HBoxContainer/VBoxContainer/TapeBar
 onready var tapeRes = $UiControl/VBoxContainer/HBoxContainer/VBoxContainer/TapeRes
@@ -76,6 +77,11 @@ func _ready():
 		rollRate = 0
 		pitchRate = 0
 		yawRate = 0
+	var colorDict = {}
+	for sensor in sensors:
+		sensor.reset()
+		colorDict["Sensor" + str(sensor.sensorNumber)] = sensor.sensorColor
+	tapeRes.colors = colorDict
 	pass
 
 
@@ -192,14 +198,11 @@ func start():
 	rtgRes.maximum = rtgLifetimeTicks
 	rtgRes.value = rtgLifetimeTicks
 	
-	# Randomize sensor params and copy colors to tape bar
-	var colorDict = {}
+	# Randomize sensor params
 	for sensor in sensors:
 		sensor.reset()
 		sensor.sciPerTick = randi() % 13 + 1
 		sensor.powerPerTick = randi() % 13 + 1
-		colorDict["Sensor" + str(sensor.sensorNumber)] = sensor.sensorColor
-	tapeRes.colors = colorDict
 	
 	$StartLabel.visible = false
 	
@@ -220,6 +223,7 @@ func start():
 	rollRate = PI * rand_range(-0.02, 0.02)
 	pitchRate = PI * rand_range(-0.02, 0.02)
 	yawRate = PI * rand_range(-0.02, 0.02)
+	ship.transform = initialTransform
 	
 	# Init game
 	totalLifetime = 0
