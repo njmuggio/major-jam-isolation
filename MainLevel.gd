@@ -1,9 +1,9 @@
 extends Node2D
 
-var debug: bool = true
+var debug: bool = false
 
 const physicsFps = 60 # UPDATE THIS IF PHYSICS RATE GETS UPDATED - CAN'T READ A CONSTANT FROM PROJECT SETTINGS
-const gameMinutes = 1
+const gameMinutes = 2
 #const rtgLifetimeMsec = 60 * 1000 * gameMinutes
 const rtgLifetimeTicks = gameMinutes * 60 * physicsFps
 const powerPerTick = 5
@@ -33,6 +33,19 @@ onready var sensors = [
 	$UiControl/VBoxContainer/HBoxContainer/VBoxContainer/GridContainer/Sensor2,
 	$UiControl/VBoxContainer/HBoxContainer/VBoxContainer/GridContainer/Sensor3,
 	$UiControl/VBoxContainer/HBoxContainer/VBoxContainer/GridContainer/Sensor4
+]
+
+onready var sensorTexes = [
+	load("res://textures/sensors/icons_decay.png"),
+	load("res://textures/sensors/icons_happi.png"),
+	load("res://textures/sensors/icons_heat.png"),
+	load("res://textures/sensors/icons_immDes.png"),
+	load("res://textures/sensors/icons_pineapple.png"),
+	load("res://textures/sensors/icons_radiation.png"),
+	load("res://textures/sensors/icons_radio.png"),
+	load("res://textures/sensors/icons_spectro.png"),
+#	load("res://textures/sensors/icons_ufo1.png"),
+	load("res://textures/sensors/icons_ufo2.png")
 ]
 
 var rollRate = PI * -0.01
@@ -83,7 +96,7 @@ func _process(delta):
 	var angle_to_earth = abs(rad2deg(targetBearing.angle_to(bearing)))
 	noiseShader.material.set_shader_param("seed", randf())
 	noiseShader.material.set_shader_param("density", max(0.0, range_lerp(angle_to_earth, 30, 180, 0.0, 0.5)))
-	#$UiControl/VBoxContainer/ViewportContainer.stretch_shrink = round(range_lerp(angle_to_earth, 0, 180, 1, 10))
+#	$UiControl/VBoxContainer/ViewportContainer.stretch_shrink = round(range_lerp(angle_to_earth, 0, 180, 1, 10))
 	$AudioStreamPlayer.pitch_scale = min(1.0, range_lerp(angle_to_earth, 30, 180, 1.0, 0.8))
 	pass
 
@@ -155,8 +168,7 @@ func start():
 	tapeRes.minimum = 0
 	tapeRes.maximum = tapeSize
 	for field in tapeRes.fields:
-		tapeRes.__set_value(field, 0)
-		print(field)
+		tapeRes.try_set_value(field, 0)
 	
 	# Battery setup
 	batRes.minimum = 0
@@ -169,7 +181,7 @@ func start():
 	rtgRes.value = rtgLifetimeTicks
 	
 	# Randomize sensor params and copy colors to tape bar
-	var colorDict: Dictionary
+	var colorDict = {}
 	for sensor in sensors:
 		sensor.reset()
 		sensor.sciPerTick = randi() % 13 + 1
@@ -178,6 +190,20 @@ func start():
 	tapeRes.colors = colorDict
 	
 	$StartLabel.visible = false
+	
+	var selections = []
+	for i in range(sensorTexes.size()):
+		selections.append(i)
+# warning-ignore:unused_variable
+	for i in range(selections.size() - 5):
+		selections.remove(randi() % selections.size())
+	for i in range(selections.size()):
+		var other = randi() % selections.size()
+		var t = selections[other]
+		selections[other] = selections[i]
+		selections[i] = t
+	for i in range(selections.size()):
+		sensors[i].sensorTexture = sensorTexes[selections[i]]
 	
 	# Init game
 	totalLifetime = 0

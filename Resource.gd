@@ -31,6 +31,10 @@ func apply(amt):
 	var newVal = value + amt
 #	if newVal >= minimum and newVal <= maximum:
 	value = newVal
+	if value < minimum:
+		value = minimum
+	if value > maximum:
+		value = maximum
 	return value
 
 
