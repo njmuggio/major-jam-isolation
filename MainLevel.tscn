@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=2]
+[gd_scene load_steps=16 format=2]
 
 [ext_resource path="res://music/life_in_corrupted_binary_01.ogg" type="AudioStream" id=1]
 [ext_resource path="res://MainLevel.gd" type="Script" id=2]
@@ -8,6 +8,7 @@
 [ext_resource path="res://textures/crosshair.png" type="Texture" id=6]
 [ext_resource path="res://MultiResource.tscn" type="PackedScene" id=7]
 [ext_resource path="res://Sensor.tscn" type="PackedScene" id=8]
+[ext_resource path="res://textures/fonts/mono45-headline.fnt" type="BitmapFont" id=9]
 [ext_resource path="res://Resource.tscn" type="PackedScene" id=10]
 [ext_resource path="res://Gimbal.tscn" type="PackedScene" id=11]
 
@@ -152,35 +153,35 @@ size_flags_vertical = 3
 columns = 5
 
 [node name="Sensor0" parent="UiControl/VBoxContainer/HBoxContainer/VBoxContainer/GridContainer" instance=ExtResource( 8 )]
-sensorColor = Color( 0.560784, 0.85098, 0.796078, 1 )
+sensorColor = Color( 0.980392, 0.215686, 0.415686, 1 )
 disabledColor = Color( 0.0901961, 0.0901961, 0.0941176, 1 )
 
 [node name="Sensor1" parent="UiControl/VBoxContainer/HBoxContainer/VBoxContainer/GridContainer" instance=ExtResource( 8 )]
 margin_left = 82.0
 margin_right = 160.0
 sensorNumber = 1
-sensorColor = Color( 0.670588, 0.74902, 0.388235, 1 )
+sensorColor = Color( 1, 0.694118, 0.666667, 1 )
 disabledColor = Color( 0.0901961, 0.0901961, 0.0941176, 1 )
 
 [node name="Sensor2" parent="UiControl/VBoxContainer/HBoxContainer/VBoxContainer/GridContainer" instance=ExtResource( 8 )]
 margin_left = 164.0
 margin_right = 242.0
 sensorNumber = 2
-sensorColor = Color( 0.94902, 0.721569, 0.447059, 1 )
+sensorColor = Color( 0.666667, 0.478431, 0.615686, 1 )
 disabledColor = Color( 0.0901961, 0.0901961, 0.0941176, 1 )
 
 [node name="Sensor3" parent="UiControl/VBoxContainer/HBoxContainer/VBoxContainer/GridContainer" instance=ExtResource( 8 )]
 margin_left = 246.0
 margin_right = 324.0
 sensorNumber = 3
-sensorColor = Color( 0.94902, 0.439216, 0.321569, 1 )
+sensorColor = Color( 0.239216, 0.807843, 0.666667, 1 )
 disabledColor = Color( 0.0901961, 0.0901961, 0.0941176, 1 )
 
 [node name="Sensor4" parent="UiControl/VBoxContainer/HBoxContainer/VBoxContainer/GridContainer" instance=ExtResource( 8 )]
 margin_left = 328.0
 margin_right = 406.0
 sensorNumber = 4
-sensorColor = Color( 0.85098, 0.313726, 0.262745, 1 )
+sensorColor = Color( 0, 0.462745, 0.541176, 1 )
 disabledColor = Color( 0.0901961, 0.0901961, 0.0941176, 1 )
 
 [node name="TapeRes" parent="UiControl/VBoxContainer/HBoxContainer/VBoxContainer" instance=ExtResource( 7 )]
@@ -190,11 +191,11 @@ margin_top = 76.0
 margin_right = 407.0
 margin_bottom = 80.0
 colors = {
-"Sensor0": Color( 0.560784, 0.85098, 0.796078, 1 ),
-"Sensor1": Color( 0.670588, 0.74902, 0.388235, 1 ),
-"Sensor2": Color( 0.94902, 0.721569, 0.447059, 1 ),
-"Sensor3": Color( 0.94902, 0.439216, 0.321569, 1 ),
-"Sensor4": Color( 0.85098, 0.313726, 0.262745, 1 )
+"Sensor0": Color( 1, 0.0431373, 0, 1 ),
+"Sensor1": Color( 1, 0.988235, 0, 1 ),
+"Sensor2": Color( 0.6, 0.960784, 0.392157, 1 ),
+"Sensor3": Color( 0.0392157, 0.282353, 0.960784, 1 ),
+"Sensor4": Color( 0.960784, 0.392157, 0.92549, 1 )
 }
 
 [node name="BatRes" parent="UiControl/VBoxContainer/HBoxContainer/VBoxContainer" instance=ExtResource( 10 )]
@@ -215,3 +216,38 @@ rect_min_size = Vector2( 0, 4 )
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
 stream = ExtResource( 1 )
 autoplay = true
+
+[node name="ScienceLbl" type="Label" parent="."]
+margin_left = 328.0
+margin_top = 2.0
+margin_right = 508.0
+margin_bottom = 20.0
+custom_fonts/font = ExtResource( 9 )
+text = "Science: 0"
+align = 2
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="LifetimeLbl" type="Label" parent="."]
+margin_left = 328.0
+margin_top = 12.0
+margin_right = 508.0
+margin_bottom = 30.0
+custom_fonts/font = ExtResource( 9 )
+text = "Lifetime: 0 days"
+align = 2
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="StartLabel" type="Label" parent="."]
+margin_left = 3.40227
+margin_top = 183.537
+margin_right = 183.402
+margin_bottom = 201.537
+custom_fonts/font = ExtResource( 9 )
+text = "[Enter] to start"
+__meta__ = {
+"_edit_use_anchors_": false
+}

@@ -27,8 +27,6 @@ func _process(_delta):
 		rect.rect_size[0] = width
 		rect.rect_position[0] = totalWidth
 		totalWidth += width
-		if val == 99:
-			print("")
 	pass
 
 

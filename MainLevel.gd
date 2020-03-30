@@ -46,10 +46,12 @@ var rollMod = 0
 var yawMod = 0
 
 var count = 0
-var gameActive = true
+var gameActive = false
+var gameOver = false
 
 var powerPerSci = 3
 var totalSciTransmitted = 0
+var totalLifetime = 0
 
 
 # Called when the node enters the scene tree for the first time.
@@ -59,20 +61,23 @@ func _ready():
 		rollRate = 0
 		pitchRate = 0
 		yawRate = 0
-	start()
+#	start()
 	pass
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
 	if not gameActive:
-		$AudioStreamPlayer.pitch_scale = lerp($AudioStreamPlayer.pitch_scale, 0.5, delta)
+		if gameOver:
+			$AudioStreamPlayer.pitch_scale = lerp($AudioStreamPlayer.pitch_scale, 0.5, delta)
 		return
 	
 	if batRes.value <= 0 and rtgRes.value <= 0:
 		game_over()
 	
-	
+	totalLifetime += 1
+	$ScienceLbl.text = "Science: " + str(totalSciTransmitted)
+	$LifetimeLbl.text = "Lifetime: %d days" % (totalLifetime / 10)
 	
 	# https://docs.godotengine.org/en/3.2/tutorials/3d/using_transforms.html
 	var bearing = ship.transform.basis.z
@@ -86,6 +91,8 @@ func _process(delta):
 
 func _physics_process(delta):
 	if not gameActive:
+		if Input.is_action_just_pressed("ui_accept"):
+			start()
 		return
 	
 	if rtgRes.value > 0: # As long as RTG is alive, add power to battery
@@ -148,6 +155,9 @@ func start():
 	# Tape setup
 	tapeRes.minimum = 0
 	tapeRes.maximum = tapeSize
+	for field in tapeRes.fields:
+		tapeRes.__set_value(field, 0)
+		print(field)
 	
 	# Battery setup
 	batRes.minimum = 0
@@ -159,19 +169,28 @@ func start():
 	rtgRes.maximum = rtgLifetimeTicks
 	rtgRes.value = rtgLifetimeTicks
 	
-	# Randomize sensor params
+	# Randomize sensor params and copy colors to tape bar
+	var colorDict: Dictionary
 	for sensor in sensors:
+		sensor.reset()
 		sensor.sciPerTick = randi() % 13 + 1
 		sensor.powerPerTick = randi() % 13 + 1
+		colorDict["Sensor" + str(sensor.sensorNumber)] = sensor.sensorColor
+	tapeRes.colors = colorDict
+	
+	$StartLabel.visible = false
 	
 	# Init game
+	totalLifetime = 0
+	gameOver = false
 	gameActive = true
 	pass
 
 
 func game_over():
-	print("Game should end now")
+	$StartLabel.visible = true
 	gameActive = false
+	gameOver = true
 	pass
 
 

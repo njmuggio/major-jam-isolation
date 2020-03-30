@@ -136,3 +136,16 @@ func set_sciPerTick(val):
 func set_powerPerTick(val):
 	powerPerTick = val
 	$PowerStatus.value = powerPerTick
+
+
+func reset():
+	SetEnabled(false)
+	SetUsage(DataUsage.storage)
+	$PowerStatus.value = powerPerTick
+	$ScienceStatus.value = sciPerTick
+	$BroadcastStatus.max_value = sciPerTick
+	$BroadcastStatus.value = 0
+	
+	downlinkHistory.clear()
+	for i in range(downlinkHistoryLength):
+		downlinkHistory.append(0)

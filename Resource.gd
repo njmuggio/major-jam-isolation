@@ -29,8 +29,8 @@ func _process(_delta):
 # Returns the new value.
 func apply(amt):
 	var newVal = value + amt
-	if newVal >= minimum and newVal <= maximum:
-		value = newVal
+#	if newVal >= minimum and newVal <= maximum:
+	value = newVal
 	return value
 
 
