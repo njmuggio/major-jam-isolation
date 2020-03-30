@@ -61,7 +61,6 @@ func _ready():
 		rollRate = 0
 		pitchRate = 0
 		yawRate = 0
-#	start()
 	pass
 
 

@@ -14,6 +14,7 @@ export(DataUsage) var usage = DataUsage.storage
 export(int) var sciPerTick = 1 setget set_sciPerTick
 export(int) var powerPerTick = 1 setget set_powerPerTick
 export(Color) var disabledColor = Color.gray
+export(Texture) var sensorTexture = null setget set_sensorTexture
 
 onready var powerButton = $EnabledButton
 onready var storeButton = $StoreButton
@@ -136,6 +137,11 @@ func set_sciPerTick(val):
 func set_powerPerTick(val):
 	powerPerTick = val
 	$PowerStatus.value = powerPerTick
+
+
+func set_sensorTexture(val):
+	sensorTexture = val
+	$SensorTexture.texture = val
 
 
 func reset():
