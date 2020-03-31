@@ -27,4 +27,4 @@ light_color = Color( 0.984314, 0.980392, 0.85098, 1 )
 transform = Transform( 4.88762e-06, -10, 1.62921e-06, -5.30863e-13, 1.62921e-06, 10, -10, -4.88762e-06, 2.65432e-13, -0.748, 0, 0 )
 
 [node name="Satellite" parent="Spatial" instance=ExtResource( 2 )]
-transform = Transform( 1, 0, 5.0822e-21, 0, 1, 1.42108e-14, 6.77626e-21, -1.42109e-14, 1, 0, 0, 0 )
+transform = Transform( 1, 0, 1.18585e-20, 0, 1, 4.26326e-14, 2.03288e-20, -5.68434e-14, 1, 0, 0, 0 )
