@@ -1,6 +1,9 @@
 extends Control
+class_name Sensor
 
 enum DataUsage { storage, broadcast}
+
+const downlinkHistoryLength = 60
 
 # Sensor Configuration
 export(int) var sensorNumber = 0
@@ -9,15 +12,18 @@ export(Color) var sensorColor = Color.green
 export(bool) var enabled = false
 export(DataUsage) var usage = DataUsage.storage
 # Sensor Attributes
-export(float) var sciPerTick = 1.0
-export(float) var powerPerTick = 1.0
+export(int) var sciPerTick = 1 setget set_sciPerTick
+export(int) var powerPerTick = 1 setget set_powerPerTick
 export(Color) var disabledColor = Color.gray
+export(Texture) var sensorTexture = null setget set_sensorTexture
 
 onready var powerButton = $EnabledButton
 onready var storeButton = $StoreButton
 onready var broadcastButton = $BroadcastButton
 var battery
 var storageTape
+var mainLevel
+var downlinkHistory = []
 
 
 
@@ -37,13 +43,21 @@ var storageTape
 func _ready():
 	battery = get_parent().get_parent().get_node("BatRes")
 	storageTape = get_parent().get_parent().get_node("TapeRes")
+	mainLevel = get_tree().root.get_node("Node2D")
 	SetEnabled(enabled)
 	SetUsage(usage)
+	$PowerStatus.value = powerPerTick
+	$ScienceStatus.value = sciPerTick
+	$BroadcastStatus.max_value = sciPerTick
+	$BroadcastStatus.value = 0
+	
+	for i in range(downlinkHistoryLength):
+		downlinkHistory.append(0)
 	pass
 
 
 # Called every physics tick. 'delta' is the elapsed time since the previous frame.
-func _physics_process(delta):
+func _physics_process(_delta):
 	if enabled:
 		# Request Power
 		if battery.reserve(powerPerTick):
@@ -53,9 +67,25 @@ func _physics_process(delta):
 					SetEnabled(false)
 				
 			else:
-				# SciAmount? += sciPerTick
-				# 'Broadcast' from stored data first
-				storageTape.try_change_value("Sensor"+str(sensorNumber), -sciPerTick)
+				var sciToSend = storageTape.get_value("Sensor"+str(sensorNumber))
+				var directLink = false
+				if sciToSend <= 0:
+					directLink = true
+					sciToSend = sciPerTick
+				elif sciToSend > sciPerTick:
+					sciToSend = sciPerTick
+				var broadcastAmount = mainLevel.try_broadcast(sciToSend, directLink)
+				if !directLink:
+					storageTape.try_change_value("Sensor"+str(sensorNumber), -broadcastAmount)
+				
+				downlinkHistory.append(broadcastAmount)
+				if downlinkHistory.size() > downlinkHistoryLength:
+					downlinkHistory.remove(0)
+				var sum = 0.0
+				for i in downlinkHistory:
+					sum += i
+				$BroadcastStatus.value = sum / downlinkHistory.size()
+				print($BroadcastStatus.value)
 				
 		# Power down sensor if insufficient power
 		else:
@@ -97,3 +127,32 @@ func _on_StoreButton_pressed():
 func _on_BroadcastButton_pressed():
 	SetUsage(DataUsage.broadcast)
 	pass
+
+
+func set_sciPerTick(val):
+	sciPerTick = val
+	$ScienceStatus.value = sciPerTick
+	$BroadcastStatus.max_value = sciPerTick
+
+
+func set_powerPerTick(val):
+	powerPerTick = val
+	$PowerStatus.value = powerPerTick
+
+
+func set_sensorTexture(val):
+	sensorTexture = val
+	$SensorTexture.texture = val
+
+
+func reset():
+	SetEnabled(false)
+	SetUsage(DataUsage.storage)
+	$PowerStatus.value = powerPerTick
+	$ScienceStatus.value = sciPerTick
+	$BroadcastStatus.max_value = sciPerTick
+	$BroadcastStatus.value = 0
+	
+	downlinkHistory.clear()
+	for i in range(downlinkHistoryLength):
+		downlinkHistory.append(0)

@@ -18,7 +18,7 @@ func _ready():
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta):
+func _process(_delta):
 	var totalWidth = 0
 	for field in fields:
 		var val = fields[field].value
@@ -27,8 +27,6 @@ func _process(delta):
 		rect.rect_size[0] = width
 		rect.rect_position[0] = totalWidth
 		totalWidth += width
-		if val == 99:
-			print("")
 	pass
 
 
@@ -61,10 +59,12 @@ func __set_value(key: String, val: int):
 
 
 # Try to update the value associated with 'key' by adding 'amt'.
-# Returns true if the total sum is <= maximum, false otherwise.
+# Returns true if the total sum is <= maximum and the field's value would not become negative, false otherwise.
 func try_change_value(key: String, amt: int):
 	var sum = 0
 	var val = null
+	if fields.has(key) && fields[key].value <= 0 && amt < 0:
+		return false
 	for field in fields:
 		sum += fields[field].value
 		if field == key:
@@ -74,6 +74,13 @@ func try_change_value(key: String, amt: int):
 		__set_value(key, val + amt)
 		return true
 	return false
+	
+func get_value(key: String):
+	if not fields.has(key):
+		print(str(key) + " has not been registered as a key")
+		print_stack()
+		return 0 
+	return fields[key].value
 
 # Try to set the value associated with 'key' to 'val'.
 # Returns true if the total sum is <= maximum, false otherwise.

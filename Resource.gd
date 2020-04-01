@@ -18,7 +18,7 @@ func _ready():
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta):
+func _process(_delta):
 	bar.value = value
 	var hue = range_lerp(value, minimum, maximum, minimum_hue, maximum_hue)
 	bar.tint_progress = Color.from_hsv(hue / 360, 1, 1)
@@ -29,8 +29,12 @@ func _process(delta):
 # Returns the new value.
 func apply(amt):
 	var newVal = value + amt
-	if newVal >= minimum and newVal <= maximum:
-		value = newVal
+#	if newVal >= minimum and newVal <= maximum:
+	value = newVal
+	if value < minimum:
+		value = minimum
+	if value > maximum:
+		value = maximum
 	return value
 
 

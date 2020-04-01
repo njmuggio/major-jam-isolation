@@ -18,6 +18,7 @@ onready var satCluster = $UiControl/VBoxContainer/ViewportContainer/Viewport/Spa
 
 onready var noiseShader = $UiControl/VBoxContainer/ViewportContainer/ColorRect
 
+onready var initialTransform = ship.transform
 onready var targetBearing = ship.transform.basis.z
 #onready var tapeBar = $UiControl/VBoxContainer/HBoxContainer/VBoxContainer/TapeBar
 onready var tapeRes = $UiControl/VBoxContainer/HBoxContainer/VBoxContainer/TapeRes
@@ -26,6 +27,27 @@ onready var batRes = $UiControl/VBoxContainer/HBoxContainer/VBoxContainer/BatRes
 #onready var rtgBar = $UiControl/VBoxContainer/HBoxContainer/VBoxContainer/RtgBar
 onready var rtgRes = $UiControl/VBoxContainer/HBoxContainer/VBoxContainer/RtgRes
 onready var gimbalTransform = gimbal.transform
+
+onready var sensors = [
+	$UiControl/VBoxContainer/HBoxContainer/VBoxContainer/GridContainer/Sensor0,
+	$UiControl/VBoxContainer/HBoxContainer/VBoxContainer/GridContainer/Sensor1,
+	$UiControl/VBoxContainer/HBoxContainer/VBoxContainer/GridContainer/Sensor2,
+	$UiControl/VBoxContainer/HBoxContainer/VBoxContainer/GridContainer/Sensor3,
+	$UiControl/VBoxContainer/HBoxContainer/VBoxContainer/GridContainer/Sensor4
+]
+
+onready var sensorTexes = [
+	preload("res://textures/sensors/icons_decay.png"),
+	preload("res://textures/sensors/icons_happi.png"),
+	preload("res://textures/sensors/icons_heat.png"),
+	preload("res://textures/sensors/icons_immDes.png"),
+	preload("res://textures/sensors/icons_pineapple.png"),
+	preload("res://textures/sensors/icons_radiation.png"),
+	preload("res://textures/sensors/icons_radio.png"),
+	preload("res://textures/sensors/icons_spectro.png"),
+#	preload("res://textures/sensors/icons_ufo1.png"),
+	preload("res://textures/sensors/icons_ufo2.png")
+]
 
 var rollRate = PI * -0.01
 var pitchRate = PI * 0.01
@@ -37,43 +59,70 @@ var pitchMod = 0
 var rollMod = 0
 var yawMod = 0
 
+var gameOverWorldRate = 1.0
+
 var count = 0
-var gameActive = true
+var gameActive = false
+var gameOver = false
+
+var powerPerSci = 3
+var totalSciTransmitted = 0
+var totalLifetime = 0
 
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
+	randomize()
 	if debug:
 		rollRate = 0
 		pitchRate = 0
 		yawRate = 0
-	start()
+	var colorDict = {}
+	for sensor in sensors:
+		sensor.reset()
+		colorDict["Sensor" + str(sensor.sensorNumber)] = sensor.sensorColor
+	tapeRes.colors = colorDict
 	pass
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta):
+func _process(_delta):
+	var bearing = ship.transform.basis.z
+	var angle_to_earth = abs(rad2deg(targetBearing.angle_to(bearing)))
+	noiseShader.material.set_shader_param("seed", randf())
+	noiseShader.material.set_shader_param("density", max(0.0, range_lerp(angle_to_earth, 30, 180, 0.0, 0.5)))
+	noiseShader.material.set_shader_param("noise1", rand_range(35, 45))
+	noiseShader.material.set_shader_param("noise2", rand_range(10, 20))
+	noiseShader.material.set_shader_param("noise3", rand_range(45000, 65000))
+	
 	if not gameActive:
-		$AudioStreamPlayer.pitch_scale = lerp($AudioStreamPlayer.pitch_scale, 0.5, delta)
+		if gameOver:
+			$AudioStreamPlayer.pitch_scale = gameOverWorldRate#lerp(gameOverWorldRate, 0.5, delta)
 		return
 	
 	if batRes.value <= 0 and rtgRes.value <= 0:
 		game_over()
 	
-	
+	totalLifetime += 1
+	$ScienceLbl.text = "Science: " + str(totalSciTransmitted)
+	$LifetimeLbl.text = "Lifetime: %d days" % (totalLifetime / 10)
 	
 	# https://docs.godotengine.org/en/3.2/tutorials/3d/using_transforms.html
-	var bearing = ship.transform.basis.z
-	var angle_to_earth = abs(rad2deg(targetBearing.angle_to(bearing)))
-	noiseShader.material.set_shader_param("seed", randf())
-	noiseShader.material.set_shader_param("density", max(0.0, range_lerp(angle_to_earth, 30, 180, 0.0, 0.5)))
-	#$UiControl/VBoxContainer/ViewportContainer.stretch_shrink = round(range_lerp(angle_to_earth, 0, 180, 1, 10))
+	
+#	$UiControl/VBoxContainer/ViewportContainer.stretch_shrink = round(range_lerp(angle_to_earth, 0, 180, 1, 10))
 	$AudioStreamPlayer.pitch_scale = min(1.0, range_lerp(angle_to_earth, 30, 180, 1.0, 0.8))
 	pass
 
 
 func _physics_process(delta):
 	if not gameActive:
+		if Input.is_action_just_pressed("ui_accept"):
+			start()
+		elif gameOver:
+			gameOverWorldRate = lerp(gameOverWorldRate, 0.5, delta)
+			ship.rotate_x(pitchRate * delta * gameOverWorldRate)
+			ship.rotate_y(rollRate * delta * gameOverWorldRate)
+			ship.rotate_z(yawRate * delta * gameOverWorldRate)
 		return
 	
 	if rtgRes.value > 0: # As long as RTG is alive, add power to battery
@@ -136,38 +185,83 @@ func start():
 	# Tape setup
 	tapeRes.minimum = 0
 	tapeRes.maximum = tapeSize
+	for field in tapeRes.fields:
+		tapeRes.try_set_value(field, 0)
 	
 	# Battery setup
 	batRes.minimum = 0
 	batRes.maximum = maxBatteryPower
-	batRes.value = maxBatteryPower / 2
+	batRes.value = int(maxBatteryPower / 2.0)
 	
 	# RTG setup
 	rtgRes.minimum = 0
 	rtgRes.maximum = rtgLifetimeTicks
 	rtgRes.value = rtgLifetimeTicks
 	
+	# Randomize sensor params
+	for sensor in sensors:
+		sensor.reset()
+		sensor.sciPerTick = randi() % 13 + 1
+		sensor.powerPerTick = randi() % 13 + 1
+	
+	$StartLabel.visible = false
+	
+	var selections = []
+	for i in range(sensorTexes.size()):
+		selections.append(i)
+	for _i in range(selections.size() - 5):
+		selections.remove(randi() % selections.size())
+	for i in range(selections.size()):
+		var other = randi() % selections.size()
+		var t = selections[other]
+		selections[other] = selections[i]
+		selections[i] = t
+	for i in range(selections.size()):
+		sensors[i].sensorTexture = sensorTexes[selections[i]]
+	
+	# Random starting velocity
+	rollRate = PI * rand_range(-0.02, 0.02)
+	pitchRate = PI * rand_range(-0.02, 0.02)
+	yawRate = PI * rand_range(-0.02, 0.02)
+	ship.transform = initialTransform
+	
 	# Init game
+	totalLifetime = 0
+	gameOver = false
 	gameActive = true
 	pass
 
 
 func game_over():
-	print("Game should end now")
+	$StartLabel.visible = true
+	gameOverWorldRate = 1.0
 	gameActive = false
+	gameOver = true
 	pass
+
+
+func try_broadcast(sciAmount, directLink):
+	var angle_to_earth = abs(rad2deg(targetBearing.angle_to(ship.transform.basis.z)))
+	var powerNeeded = 0
+	var powerAvailable = batRes.value
 	
-# Per Sensor
-# State
-# On/Off
-# Store/Broadcast
-# Broadcast sends data from storage first, sends live data once storage
-#
-# Power/tick required
-# 'Science'/tick - Same for broadcast or store
-# Keep track of Science broadcast per sensor
-#
-# Call request power function -> power function returns whether or not sufficient power is available
-# Call request store function -> store function returns how much it was able to store
-#
-# Turn off sensors that don't receive full power
+	# Check power needed to transmit requested amount
+	if angle_to_earth > 100:
+		return 0
+	elif angle_to_earth < 30:
+		powerNeeded = powerPerSci * sciAmount
+	else:
+		powerNeeded = ((4*(angle_to_earth - 30)/70.0) + 1) * powerPerSci * sciAmount
+	
+	if batRes.reserve(powerNeeded):
+		totalSciTransmitted += sciAmount
+		return sciAmount
+	elif directLink:
+		# Should drain the battery
+		batRes.reserve(powerAvailable)
+		var sciSent = (powerAvailable / powerNeeded) * sciAmount
+		print("Direct Link at low power: sent " + str(sciSent) + " instead of " + str(sciAmount))
+		totalSciTransmitted += sciSent
+		return sciSent
+	else:
+		return 0
