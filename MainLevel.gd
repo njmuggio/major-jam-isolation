@@ -90,7 +90,7 @@ func _process(_delta):
 	var bearing = ship.transform.basis.z
 	var angle_to_earth = abs(rad2deg(targetBearing.angle_to(bearing)))
 	noiseShader.material.set_shader_param("seed", randf())
-	noiseShader.material.set_shader_param("density", max(0.0, range_lerp(angle_to_earth, 30, 180, 0.0, 0.5)))
+	noiseShader.material.set_shader_param("density", clamp(range_lerp(angle_to_earth, 30, 180, 0.0, 0.5), 0.0, 0.5))
 	noiseShader.material.set_shader_param("noise1", rand_range(35, 45))
 	noiseShader.material.set_shader_param("noise2", rand_range(10, 20))
 	noiseShader.material.set_shader_param("noise3", rand_range(45000, 65000))
