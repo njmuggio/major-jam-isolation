@@ -1,4 +1,5 @@
 extends Control
+class_name Sensor
 
 enum DataUsage { storage, broadcast}
 

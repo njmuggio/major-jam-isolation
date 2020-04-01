@@ -1,0 +1,15 @@
+[remap]
+
+importer="ogg_vorbis"
+type="AudioStreamOGGVorbis"
+path="res://.import/mythica_01.ogg-5d0a9edbae55aa6c80edc167bc65d3d6.oggstr"
+
+[deps]
+
+source_file="res://music/mythica_01.ogg"
+dest_files=[ "res://.import/mythica_01.ogg-5d0a9edbae55aa6c80edc167bc65d3d6.oggstr" ]
+
+[params]
+
+loop=true
+loop_offset=0
