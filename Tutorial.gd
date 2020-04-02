@@ -47,7 +47,7 @@ onready var texts = [
 	"This is your generator\n\nYou will generate power until this bar runs out",
 	"This is your battery\n\nGenerated power will be stored here\n\nAll flight systems deplete battery power",
 	"This is your tape drive\n\nScience not immediately downlinked will be stored here",
-	"This is your satellite\n\nAny rotation will be reflected here",
+	"This is your satellite\n\nAny rotation will be reflected here\n\nRotate with Q/E, W/S, A/D",
 	"This is your gimbal\n\nWhen the red circle is centered, your antenna is pointed at Earth\n\nScience takes less power to downlink if Earth is in focus",
 	"These are your sensors\n\nThese are used to collect and transmit science",
 	"These are the sensor power buttons\n\nSensors consume extra power when on\n\nWhen a sensor is on, it is always storing to the tape\nor downlinking data",
@@ -94,7 +94,7 @@ func _process(_delta):
 	
 	match currentTutorialFrame:
 		4:
-			$Tut/Text.rect_position = Vector2(0, 150)
+			$Tut/Text.rect_position = Vector2(0, 160)
 		_:
 			$Tut/Text.rect_position = tutRect
 	
