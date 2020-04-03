@@ -25,6 +25,7 @@ onready var tapeRes = $UiControl/VBoxContainer/HBoxContainer/VBoxContainer/TapeR
 onready var batRes = $UiControl/VBoxContainer/HBoxContainer/VBoxContainer/BatRes
 onready var rtgRes = $UiControl/VBoxContainer/HBoxContainer/VBoxContainer/RtgRes
 onready var gimbalTransform = gimbal.transform
+onready var boomText = $Boom
 
 onready var sensors = [
 	$UiControl/VBoxContainer/HBoxContainer/VBoxContainer/GridContainer/Sensor0,
@@ -151,6 +152,12 @@ func _physics_process(delta):
 	rollRate += rollMod * rotAccel * delta * powerFraction
 	yawRate += yawMod * rotAccel * delta * powerFraction
 	
+	if pitchRate + rollRate + yawRate > 10:
+		ship.visible = false
+		boomText.visible = true
+		game_over()
+	print(pitchRate + rollRate + yawRate)	
+	
 	ship.rotate_x(pitchRate * delta)
 	ship.rotate_y(rollRate * delta)
 	ship.rotate_z(yawRate * delta)
@@ -245,8 +252,10 @@ func start():
 	pitchRate = PI * rand_range(-0.03, 0.03)
 	yawRate = PI * rand_range(-0.03, 0.03)
 	ship.transform = initialTransform
+	ship.visible = true
 	
 	nextSensorMutateTime = rand_range(5, 10)
+	boomText.visible = false
 	
 	# Init game
 	totalSciTransmitted = 0

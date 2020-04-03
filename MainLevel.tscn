@@ -226,3 +226,15 @@ text = "[Enter] to start"
 __meta__ = {
 "_edit_use_anchors_": false
 }
+
+[node name="Boom" type="Label" parent="."]
+visible = false
+margin_top = 100.0
+margin_right = 512.0
+margin_bottom = 118.0
+custom_fonts/font = ExtResource( 9 )
+text = "You have died of dysentery"
+align = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}
