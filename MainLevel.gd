@@ -2,15 +2,13 @@ extends Node2D
 
 var debug: bool = false
 
-const physicsFps = 60 # UPDATE THIS IF PHYSICS RATE GETS UPDATED - CAN'T READ A CONSTANT FROM PROJECT SETTINGS
-const gameMinutes = 1
-#const rtgLifetimeMsec = 60 * 1000 * gameMinutes
-const rtgLifetimeTicks = gameMinutes * 60 * physicsFps
-const powerPerTick = 5
-const maxBatteryPower = 10000 * gameMinutes
-const idlePowerUse = 1
+const gameMinutes = 2
+const rtgLifetimeSecs = gameMinutes * 60
+const powerPerSec = 600
+const maxBatteryPower = 10000
 const reactionWheelPowerUse = 10
-const tapeSize = 1000 * gameMinutes
+const tapeSize = 1000
+const secsPerDay = 0.5
 
 onready var ship = $UiControl/VBoxContainer/ViewportContainer/Viewport/Spatial/Spatial/Satellite
 onready var gimbal = $UiControl/VBoxContainer/HBoxContainer/ViewportContainer/Viewport/Spatial/Gimbal
@@ -103,9 +101,8 @@ func _process(_delta):
 	if batRes.value <= 0 and rtgRes.value <= 0:
 		game_over()
 	
-	totalLifetime += 1
-	$ScienceLbl.text = "Science: " + str(totalSciTransmitted)
-	$LifetimeLbl.text = "Lifetime: %d days" % (totalLifetime / 10)
+	$ScienceLbl.text = "Science: %d" % int(totalSciTransmitted)
+	$LifetimeLbl.text = "Lifetime: %d days" % int(totalLifetime / secsPerDay)
 	
 	# https://docs.godotengine.org/en/3.2/tutorials/3d/using_transforms.html
 	
@@ -124,10 +121,11 @@ func _physics_process(delta):
 			ship.rotate_y(rollRate * delta * gameOverWorldRate)
 			ship.rotate_z(yawRate * delta * gameOverWorldRate)
 		return
+		
+	totalLifetime += delta
 	
 	if rtgRes.value > 0: # As long as RTG is alive, add power to battery
-		batRes.apply(powerPerTick)
-	batRes.apply(-idlePowerUse)
+		batRes.apply(powerPerSec * delta)
 	
 	# Figure out power requested for rotation
 	var powerNeeded = (abs(pitchMod) + abs(rollMod) + abs(yawMod)) * reactionWheelPowerUse
@@ -138,7 +136,7 @@ func _physics_process(delta):
 		powerFraction = powerAvailable / powerNeeded
 	
 	# Reduce RTG lifetime by one tick
-	rtgRes.apply(-1)
+	rtgRes.apply(-delta)
 	
 	pitchRate += pitchMod * rotAccel * delta * powerFraction
 	rollRate += rollMod * rotAccel * delta * powerFraction
@@ -195,8 +193,8 @@ func start():
 	
 	# RTG setup
 	rtgRes.minimum = 0
-	rtgRes.maximum = rtgLifetimeTicks
-	rtgRes.value = rtgLifetimeTicks
+	rtgRes.maximum = rtgLifetimeSecs
+	rtgRes.value = rtgLifetimeSecs
 	
 	# Randomize sensor params
 	for sensor in sensors:
@@ -226,6 +224,7 @@ func start():
 	ship.transform = initialTransform
 	
 	# Init game
+	totalSciTransmitted = 0
 	totalLifetime = 0
 	gameOver = false
 	gameActive = true
