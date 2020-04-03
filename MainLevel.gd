@@ -68,6 +68,7 @@ var gameOver = false
 var powerPerSci = 3
 var totalSciTransmitted = 0
 var totalLifetime = 0
+var change_sensor_mode = false
 
 
 # Called when the node enters the scene tree for the first time.
@@ -178,6 +179,20 @@ func _input(event):
 		yawMod -= 1
 	if event.is_action_released("yaw_neg"):
 		yawMod += 1
+	if event.is_action_pressed("sensor_mode_toggle"):
+		change_sensor_mode = true
+	if event.is_action_released("sensor_mode_toggle"):
+		change_sensor_mode = false
+	if event.is_action_pressed("sensor_1"):
+		_sensor_input(0)
+	if event.is_action_pressed("sensor_2"):
+		_sensor_input(1)
+	if event.is_action_pressed("sensor_3"):
+		_sensor_input(2)
+	if event.is_action_pressed("sensor_4"):
+		_sensor_input(3)
+	if event.is_action_pressed("sensor_5"):
+		_sensor_input(4)
 	pass
 
 
@@ -260,8 +275,17 @@ func try_broadcast(sciAmount, directLink):
 		# Should drain the battery
 		batRes.reserve(powerAvailable)
 		var sciSent = (powerAvailable / powerNeeded) * sciAmount
-		print("Direct Link at low power: sent " + str(sciSent) + " instead of " + str(sciAmount))
 		totalSciTransmitted += sciSent
 		return sciSent
 	else:
 		return 0
+
+func _sensor_input(sensor):
+	if sensor < 0 or sensor >= sensors.size():
+		print("Invalid Sensor input for sensor: " + str(sensor))
+		return
+	if change_sensor_mode:
+		sensors[sensor].toggle_usage()
+	else:
+		sensors[sensor].toggle_power()
+	pass

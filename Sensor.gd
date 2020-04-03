@@ -85,7 +85,6 @@ func _physics_process(_delta):
 				for i in downlinkHistory:
 					sum += i
 				$BroadcastStatus.value = sum / downlinkHistory.size()
-				print($BroadcastStatus.value)
 				
 		# Power down sensor if insufficient power
 		else:
@@ -117,15 +116,18 @@ func SetUsage(usageType):
 	pass
 
 func _on_EnabledButton_pressed():
-	SetEnabled(!enabled)
+	if mainLevel.gameActive:
+		SetEnabled(!enabled)
 	pass
 	
 func _on_StoreButton_pressed():
-	SetUsage(DataUsage.storage)
+	if mainLevel.gameActive:
+		SetUsage(DataUsage.storage)
 	pass
 
 func _on_BroadcastButton_pressed():
-	SetUsage(DataUsage.broadcast)
+	if mainLevel.gameActive:
+		SetUsage(DataUsage.broadcast)
 	pass
 
 
@@ -156,3 +158,19 @@ func reset():
 	downlinkHistory.clear()
 	for i in range(downlinkHistoryLength):
 		downlinkHistory.append(0)
+
+func toggle_usage():
+	if !mainLevel.gameActive:
+		return
+	if usage == DataUsage.storage:
+		SetUsage(DataUsage.broadcast)
+	elif usage == DataUsage.broadcast:
+		SetUsage(DataUsage.storage)
+	else:
+		print(str(usage) + " is not a valid usage type, only DataUsage.storage and DataUsage.broadcast!")
+	pass
+		
+func toggle_power():
+	if mainLevel.gameActive:
+		SetEnabled(!enabled)
+	pass
