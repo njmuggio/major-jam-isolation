@@ -152,7 +152,7 @@ func _physics_process(delta):
 	rollRate += rollMod * rotAccel * delta * powerFraction
 	yawRate += yawMod * rotAccel * delta * powerFraction
 	
-	if abs(pitchRate) + abs(rollRate) + abs(yawRate) > 10:
+	if abs(pitchRate) + abs(rollRate) + abs(yawRate) > 30:
 		ship.visible = false
 		boomText.visible = true
 		game_over()
