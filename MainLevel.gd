@@ -5,10 +5,13 @@ var debug: bool = false
 const gameMinutes = 2
 const rtgLifetimeSecs = gameMinutes * 60
 const powerPerSec = 600
-const maxBatteryPower = 10000
+const maxBatteryPower = 30000
 const reactionWheelPowerUse = 10
-const tapeSize = 1000
+const tapeSize = 8000
 const secsPerDay = 0.5
+const idlePowerPerSec = 60
+const maxPowerScienceDiff = 3
+const maxSciMutate = 5
 
 onready var ship = $UiControl/VBoxContainer/ViewportContainer/Viewport/Spatial/Spatial/Satellite
 onready var gimbal = $UiControl/VBoxContainer/HBoxContainer/ViewportContainer/Viewport/Spatial/Gimbal
@@ -18,11 +21,8 @@ onready var noiseShader = $UiControl/VBoxContainer/ViewportContainer/ColorRect
 
 onready var initialTransform = ship.transform
 onready var targetBearing = ship.transform.basis.z
-#onready var tapeBar = $UiControl/VBoxContainer/HBoxContainer/VBoxContainer/TapeBar
 onready var tapeRes = $UiControl/VBoxContainer/HBoxContainer/VBoxContainer/TapeRes
-#onready var batBar = $UiControl/VBoxContainer/HBoxContainer/VBoxContainer/BatBar
 onready var batRes = $UiControl/VBoxContainer/HBoxContainer/VBoxContainer/BatRes
-#onready var rtgBar = $UiControl/VBoxContainer/HBoxContainer/VBoxContainer/RtgBar
 onready var rtgRes = $UiControl/VBoxContainer/HBoxContainer/VBoxContainer/RtgRes
 onready var gimbalTransform = gimbal.transform
 
@@ -68,6 +68,8 @@ var totalSciTransmitted = 0
 var totalLifetime = 0
 var change_sensor_mode = false
 
+var nextSensorMutateTime = 0
+
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -102,12 +104,11 @@ func _process(_delta):
 	if batRes.value <= 0 and rtgRes.value <= 0:
 		game_over()
 	
-	$ScienceLbl.text = "Science: %d" % int(totalSciTransmitted)
+	$ScienceLbl.text = "Science: %d erlenmeyers" % int(totalSciTransmitted)
 	$LifetimeLbl.text = "Lifetime: %d days" % int(totalLifetime / secsPerDay)
 	
 	# https://docs.godotengine.org/en/3.2/tutorials/3d/using_transforms.html
 	
-#	$UiControl/VBoxContainer/ViewportContainer.stretch_shrink = round(range_lerp(angle_to_earth, 0, 180, 1, 10))
 	$AudioStreamPlayer.pitch_scale = min(1.0, range_lerp(angle_to_earth, 30, 180, 1.0, 0.8))
 	pass
 
@@ -125,8 +126,15 @@ func _physics_process(delta):
 		
 	totalLifetime += delta
 	
+	if totalLifetime > nextSensorMutateTime:
+		var sensor = sensors[randi() % sensors.size()]
+		sensor.sciPerTick = clamp(sensor.sciPerTick +  randi() % (maxSciMutate * 2 + 1) - maxSciMutate, 1, 13)
+		nextSensorMutateTime += rand_range(5, 10)
+	
 	if rtgRes.value > 0: # As long as RTG is alive, add power to battery
 		batRes.apply(powerPerSec * delta)
+	
+	batRes.apply(-idlePowerPerSec * delta)
 	
 	# Figure out power requested for rotation
 	var powerNeeded = (abs(pitchMod) + abs(rollMod) + abs(yawMod)) * reactionWheelPowerUse
@@ -215,7 +223,7 @@ func start():
 	for sensor in sensors:
 		sensor.reset()
 		sensor.sciPerTick = randi() % 13 + 1
-		sensor.powerPerTick = randi() % 13 + 1
+		sensor.powerPerTick = clamp(round(sensor.sciPerTick + rand_range(-maxPowerScienceDiff, maxPowerScienceDiff)), 1, 13)
 	
 	$StartLabel.visible = false
 	
@@ -233,10 +241,12 @@ func start():
 		sensors[i].sensorTexture = sensorTexes[selections[i]]
 	
 	# Random starting velocity
-	rollRate = PI * rand_range(-0.02, 0.02)
-	pitchRate = PI * rand_range(-0.02, 0.02)
-	yawRate = PI * rand_range(-0.02, 0.02)
+	rollRate = PI * rand_range(-0.03, 0.03)
+	pitchRate = PI * rand_range(-0.03, 0.03)
+	yawRate = PI * rand_range(-0.03, 0.03)
 	ship.transform = initialTransform
+	
+	nextSensorMutateTime = rand_range(5, 10)
 	
 	# Init game
 	totalSciTransmitted = 0

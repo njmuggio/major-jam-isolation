@@ -38,6 +38,8 @@ config/icon="res://icon.png"
 
 [display]
 
+window/stretch/mode="viewport"
+window/stretch/aspect="keep"
 window/stretch/shrink=2.0
 
 [input]

@@ -200,6 +200,7 @@ rect_min_size = Vector2( 0, 4 )
 
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
 stream = ExtResource( 1 )
+volume_db = -15.0
 autoplay = true
 
 [node name="ScienceLbl" type="Label" parent="."]
@@ -208,7 +209,7 @@ margin_top = 2.0
 margin_right = 508.0
 margin_bottom = 20.0
 custom_fonts/font = ExtResource( 9 )
-text = "Science: 0"
+text = "Science: 0 erlenmeyers"
 align = 2
 __meta__ = {
 "_edit_use_anchors_": false
