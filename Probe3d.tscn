@@ -1,7 +1,9 @@
-[gd_scene load_steps=5 format=2]
+[gd_scene load_steps=8 format=2]
 
 [ext_resource path="res://textures/sky skins 1.png" type="Texture" id=1]
 [ext_resource path="res://models/Satellite.fbx" type="PackedScene" id=2]
+[ext_resource path="res://Probe3d.gd" type="Script" id=3]
+[ext_resource path="res://models/ufo.fbx" type="PackedScene" id=4]
 
 [sub_resource type="PanoramaSky" id=1]
 panorama = ExtResource( 1 )
@@ -11,10 +13,55 @@ background_mode = 2
 background_sky = SubResource( 1 )
 background_sky_orientation = Basis( -0.344018, -0.2933, 0.891979, -0.648784, 0.760972, 0, -0.678771, -0.578702, -0.452077 )
 
+[sub_resource type="Animation" id=3]
+resource_name = "Ufo Encounter"
+length = 2.5
+tracks/0/type = "value"
+tracks/0/path = NodePath("ufo:translation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 1, 1.9, 2.5 ),
+"transitions": PoolRealArray( 1, 1, 1, 1 ),
+"update": 0,
+"values": [ Vector3( 5.59085, 3.74165, -2.34172 ), Vector3( -0.652336, 1.11773, -0.13375 ), Vector3( -0.652336, 1.11773, -0.13375 ), Vector3( -6.71553, -1.43054, 2.01057 ) ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("Spatial:translation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0, 1.2, 1.8 ),
+"transitions": PoolRealArray( 1, 1, 1 ),
+"update": 0,
+"values": [ Vector3( -0.748, 0, 0 ), Vector3( -0.748, 0, 0 ), Vector3( -0.748, 0.953863, 2.53185e-14 ) ]
+}
+tracks/2/type = "value"
+tracks/2/path = NodePath("Spatial:scale")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/keys = {
+"times": PoolRealArray( 0, 1.2, 1.8 ),
+"transitions": PoolRealArray( 1, 1, 1 ),
+"update": 0,
+"values": [ Vector3( 10, 10, 10 ), Vector3( 10, 10, 10 ), Vector3( 0.1, 0.1, 0.1 ) ]
+}
+
 [node name="Spatial" type="Spatial"]
+script = ExtResource( 3 )
 
 [node name="Camera" type="Camera" parent="."]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1.812 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0018754, 0.0071609, 1.80857 )
+current = true
+
+[node name="UfoCamera" type="Camera" parent="."]
+transform = Transform( 1, 0, 0, 0, 0.983935, 0.178527, 0, -0.178527, 0.983935, 0, 0.978826, 2.40528 )
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource( 2 )
@@ -24,7 +71,13 @@ transform = Transform( 0.433997, 0.108988, -0.894298, -0.047584, 0.994043, 0.098
 light_color = Color( 0.984314, 0.980392, 0.85098, 1 )
 
 [node name="Spatial" type="Spatial" parent="."]
-transform = Transform( 4.88762e-06, -10, 1.62921e-06, -5.30863e-13, 1.62921e-06, 10, -10, -4.88762e-06, 2.65432e-13, -0.748, 0, 0 )
+transform = Transform( -1.62921e-06, -10, -1.62921e-06, 0, -1.62921e-06, 10, -10, 1.62921e-06, 2.65432e-13, -0.748, 0, 0 )
 
 [node name="Satellite" parent="Spatial" instance=ExtResource( 2 )]
 transform = Transform( 1, 0, 1.18585e-20, 0, 1, 4.26326e-14, 2.03288e-20, -5.68434e-14, 1, 0, 0, 0 )
+
+[node name="ufo" parent="." instance=ExtResource( 4 )]
+transform = Transform( 12.8961, -6.50357, -26.2944, -9.2664, 26.306, -11.0511, 25.4524, 12.8723, 9.2993, 5.59085, 3.74165, -2.34172 )
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+"anims/Ufo Encounter" = SubResource( 3 )

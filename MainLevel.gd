@@ -12,6 +12,8 @@ const secsPerDay = 0.5
 const idlePowerPerSec = 60
 const maxPowerScienceDiff = 3
 const maxSciMutate = 5
+const ufoThreshold = 0.75 * rtgLifetimeSecs
+const ufoScience = 10000
 
 onready var ship = $UiControl/VBoxContainer/ViewportContainer/Viewport/Spatial/Spatial/Satellite
 onready var gimbal = $UiControl/VBoxContainer/HBoxContainer/ViewportContainer/Viewport/Spatial/Gimbal
@@ -71,6 +73,9 @@ var change_sensor_mode = false
 
 var nextSensorMutateTime = 0
 
+var ufoCounter = 0
+var ufoTriggered = false
+
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -124,7 +129,20 @@ func _physics_process(delta):
 			ship.rotate_y(rollRate * delta * gameOverWorldRate)
 			ship.rotate_z(yawRate * delta * gameOverWorldRate)
 		return
+	
+	var bearing = ship.transform.basis.z
+	var angle_to_earth = abs(rad2deg(targetBearing.angle_to(bearing)))
+	
+	if angle_to_earth > 150:
+		ufoCounter += delta
 		
+	if ufoCounter > ufoThreshold and not ufoTriggered:
+		ufoTriggered = true
+		$UiControl/VBoxContainer/ViewportContainer/Viewport/Spatial.ufo_event()
+		totalSciTransmitted += ufoScience
+		$ScienceLbl.text = "Science: %d erlenmeyers" % int(totalSciTransmitted)
+		game_over()
+	
 	totalLifetime += delta
 	
 	if totalLifetime > nextSensorMutateTime:
@@ -259,8 +277,11 @@ func start():
 	# Init game
 	totalSciTransmitted = 0
 	totalLifetime = 0
+	ufoCounter = 0
+	ufoTriggered = false
 	gameOver = false
 	gameActive = true
+	$UiControl/VBoxContainer/ViewportContainer/Viewport/Spatial.reset()
 	pass
 
 
